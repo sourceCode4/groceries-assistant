@@ -4,21 +4,21 @@ import furhatos.nlu.EnumEntity
 import furhatos.nlu.Intent
 import furhatos.util.Language
 
-class Buy : EnumEntity() {
+class ActionBuy : EnumEntity() {
     override fun getEnum(lang: Language): List<String> {
-        return listOf("buy", "get", "get", "procure")
+        return listOf("buy:buy,get,purchase,pick up,shop for,procure")
     }
 }
 
 class Groceries : EnumEntity() {
     override fun getEnum(lang: Language): List<String> {
-        return listOf("groceries", "food", "stuff")
+        return listOf("groceries:groceries,food,stuff,produce,goods")
     }
 }
 
 class DoGroceries(
     val groceries: Groceries? = null,
-    val buy: Buy? = null
+    val buy: ActionBuy? = null
 ) : Intent() {
     override fun getExamples(lang: Language): List<String> {
         return listOf(
@@ -28,17 +28,35 @@ class DoGroceries(
     }
 }
 
-class MakeList : Intent() {
-    override fun getExamples(lang: Language): List<String> {
-        return listOf("I want to make a new list")
+class ActionMake : EnumEntity() {
+    override fun getEnum(lang: Language): List<String> {
+        return listOf("make:make,create,assemble,put together")
     }
 }
 
-class EditList : Intent() {
+class ActionEdit : EnumEntity() {
+    override fun getEnum(lang: Language): List<String> {
+        return listOf("edit:edit,modify,change,refine")
+    }
+}
+
+class MakeList(val make: ActionMake? = null) : Intent() {
     override fun getExamples(lang: Language): List<String> {
         return listOf(
-            "I want to edit an existing list",
-            "I want to modify an existing list"
+            "I want to @make a new list",
+            "I would like to @make a list",
+            "Can I @make a list"
+        )
+    }
+}
+
+class EditList(val edit: ActionEdit? = null) : Intent() {
+    override fun getExamples(lang: Language): List<String> {
+        return listOf(
+            "I want to @edit an existing list",
+            "I would like to @edit a list",
+            "I want to @edit a list",
+            "Can I @edit a list"
         )
     }
 }
