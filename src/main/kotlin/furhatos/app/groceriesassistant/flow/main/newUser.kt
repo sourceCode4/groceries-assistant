@@ -1,6 +1,8 @@
 package furhatos.app.groceriesassistant.flow.main
 
-import furhatos.app.groceriesassistant.flow.Parent
+import furhatos.app.groceriesassistant.flow.Global
+import furhatos.app.groceriesassistant.flow.WithUser
+import furhatos.app.groceriesassistant.flow.events.control.AskMainQuestion
 import furhatos.flow.kotlin.furhat
 import furhatos.flow.kotlin.onNoResponse
 import furhatos.flow.kotlin.onResponse
@@ -8,11 +10,13 @@ import furhatos.flow.kotlin.state
 import furhatos.nlu.common.No
 import furhatos.nlu.common.Yes
 
-fun NewUser(name: String) = state(Parent) {
+fun NewUser(name: String) = state(Global) {
     onEntry {
-        furhat.say("Nice to meet you $name!")
-        furhat.ask("I'm going to ask you for some information, is that alright?")
+        furhat.say("hi! nice to meet you $name!")
+        raise(AskMainQuestion)
     }
+
+    onEvent<AskMainQuestion> { furhat.ask("I will ask you for some basic information, is that alright?") }
 
     onResponse<Yes> {
         furhat.say("Great!")
@@ -20,11 +24,10 @@ fun NewUser(name: String) = state(Parent) {
     }
 
     onResponse<No> {
-        val areYouSure = state {
+        val areYouSure = state(WithUser) {
             var noResponse = 0
-            onEntry {
-                furhat.ask("Are you sure?")
-            }
+            onEntry { raise(AskMainQuestion) }
+            onEvent<AskMainQuestion> { furhat.ask("Are you sure?") }
 
             onResponse<Yes> {
                 furhat.say("That's a shame!")
@@ -38,7 +41,10 @@ fun NewUser(name: String) = state(Parent) {
 
             onNoResponse {
                 noResponse++
-                if (noResponse > 1) terminate(true)
+                if (noResponse > 1) {
+                    furhat.say("I guess that's a no")
+                    terminate(true)
+                }
                 else propagate()
             }
         }
@@ -48,6 +54,7 @@ fun NewUser(name: String) = state(Parent) {
     }
 }
 
+//TODO:
 fun GatherInfo(name: String) = state {
     onEntry {
         furhat.say("This is not yet implemented")

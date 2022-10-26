@@ -1,31 +1,31 @@
 package furhatos.app.groceriesassistant.flow.main
 
-import furhatos.app.groceriesassistant.flow.Parent
+import furhatos.app.groceriesassistant.flow.Global
+import furhatos.app.groceriesassistant.flow.events.control.AskMainQuestion
 import furhatos.app.groceriesassistant.flow.utils.greeting
-import furhatos.app.groceriesassistant.memory.Current
-import furhatos.app.groceriesassistant.memory.longterm.Users
+import furhatos.app.groceriesassistant.memory.Memory
 import furhatos.flow.kotlin.*
 import furhatos.nlu.common.PersonName
 
-val IdentifyUser = state(Parent) {
+val IdentifyUser = state(Global) {
     var noResponse = 0
 
     onEntry {
-        noResponse = 0
-        reentry()
+        furhat.say(greeting)
+        raise(AskMainQuestion)
     }
 
+    onEvent<AskMainQuestion> { furhat.ask("What's your name?") }
+
     onReentry {
-        furhat.say(greeting)
-        furhat.ask("What's your name?")
+        furhat.listen()
     }
 
     onResponse<PersonName> {
         val name = it.intent.text
-        val user = Users[name]
-        if (user != null) {
+        val isUser = Memory.setUser(name)
+        if (isUser) {
             furhat.say("Good to see you again $name!")
-            Current.user = user
             goto(SelectInteraction)
         }
         else goto(NewUser(name))
