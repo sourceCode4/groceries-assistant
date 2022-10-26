@@ -1,9 +1,11 @@
 package furhatos.app.groceriesassistant.flow
 
+import furhatos.app.groceriesassistant.flow.events.control.AskMainQuestion
 import furhatos.app.groceriesassistant.flow.main.Idle
 import furhatos.flow.kotlin.*
+import furhatos.nlu.common.RequestRepeat
 
-val Parent: State = state {
+val Global = state {
 
     onUserLeave(instant = true) {
         when {
@@ -15,4 +17,6 @@ val Parent: State = state {
     onUserEnter(instant = true) {
         furhat.glance(it)
     }
+
+    onResponse<RequestRepeat> { raise(AskMainQuestion) }
 }
