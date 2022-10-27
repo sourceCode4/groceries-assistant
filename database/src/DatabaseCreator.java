@@ -17,7 +17,7 @@ public class DatabaseCreator {
         //run the code below only once to set up the database the the table containing the food
         creator();
         createTable();
-        inserter();
+        //inserter();
         //     query("omato");
 
     }
