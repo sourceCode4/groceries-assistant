@@ -3,7 +3,7 @@ import furhatos.app.groceriesassistant.memory.entity.*
 
 object Users {
     /* will be replaced by a database */
-    private val users: HashMap<String, User> = hashMapOf("John" to User("John", 175, 75f, Diet()))
+    private val users: HashMap<String, User> = hashMapOf()
 
     fun isUser(name: String): Boolean = users.contains(name)
 
