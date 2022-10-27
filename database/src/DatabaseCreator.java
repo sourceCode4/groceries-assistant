@@ -80,7 +80,7 @@ public class DatabaseCreator {
         String username = "postgres";
         String password = "ana";
 
-        String csvFilePath = "C:\\Users\\ekz\\Desktop\\Copy of NEVO2021_v7.0.csv";
+        String csvFilePath = "data.csv";
 
         int batchSize = 20;
 
