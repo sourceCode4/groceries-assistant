@@ -1,0 +1,28 @@
+2022-10-27 14:52:31.095 GMT [6192] LOG:  database system was shut down at 2022-10-27 14:51:56 GMT
+2022-10-27 14:57:31.084 GMT [6176] LOG:  checkpoint starting: time
+2022-10-27 14:57:31.093 GMT [6176] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.002 s, sync=0.002 s, total=0.010 s; sync files=2, longest=0.001 s, average=0.001 s; distance=0 kB, estimate=0 kB
+2022-10-27 15:46:30.637 GMT [3588] FATAL:  password authentication failed for user "arslan"
+2022-10-27 15:46:30.637 GMT [3588] DETAIL:  Role "arslan" does not exist.
+	Connection matched pg_hba.conf line 90: "host    all             all             ::1/128                 scram-sha-256"
+2022-10-27 15:46:33.619 GMT [1856] FATAL:  password authentication failed for user "arslan"
+2022-10-27 15:46:33.619 GMT [1856] DETAIL:  Role "arslan" does not exist.
+	Connection matched pg_hba.conf line 90: "host    all             all             ::1/128                 scram-sha-256"
+2022-10-27 15:46:57.200 GMT [15012] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2022-10-27 15:51:57.049 GMT [8776] FATAL:  password authentication failed for user "arsla"
+2022-10-27 15:51:57.049 GMT [8776] DETAIL:  Role "arsla" does not exist.
+	Connection matched pg_hba.conf line 90: "host    all             all             ::1/128                 scram-sha-256"
+2022-10-27 15:52:01.618 GMT [6848] FATAL:  password authentication failed for user "arsla"
+2022-10-27 15:52:01.618 GMT [6848] DETAIL:  Role "arsla" does not exist.
+	Connection matched pg_hba.conf line 90: "host    all             all             ::1/128                 scram-sha-256"
+2022-10-27 15:52:08.951 GMT [7552] FATAL:  password authentication failed for user "arsla"
+2022-10-27 15:52:08.951 GMT [7552] DETAIL:  Role "arsla" does not exist.
+	Connection matched pg_hba.conf line 90: "host    all             all             ::1/128                 scram-sha-256"
+2022-10-27 15:52:09.611 GMT [16296] FATAL:  password authentication failed for user "arsla"
+2022-10-27 15:52:09.611 GMT [16296] DETAIL:  Role "arsla" does not exist.
+	Connection matched pg_hba.conf line 90: "host    all             all             ::1/128                 scram-sha-256"
+2022-10-27 15:54:22.849 GMT [11248] FATAL:  terminating connection due to administrator command
+2022-10-27 15:54:22.849 GMT [12764] FATAL:  terminating connection due to administrator command
+2022-10-27 15:54:22.877 GMT [6176] LOG:  shutting down
+2022-10-27 15:54:22.878 GMT [6176] LOG:  checkpoint starting: shutdown immediate
+2022-10-27 15:54:22.884 GMT [6176] LOG:  checkpoint complete: wrote 0 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.001 s, sync=0.001 s, total=0.008 s; sync files=0, longest=0.000 s, average=0.000 s; distance=0 kB, estimate=0 kB
