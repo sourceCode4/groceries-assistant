@@ -1,8 +1,11 @@
 package furhatos.app.groceriesassistant
 
+import TestClassInterop.createTable
+
 import furhatos.app.groceriesassistant.flow.Init
 import furhatos.skills.Skill
 import furhatos.flow.kotlin.*
+
 
 class GroceriesassistantSkill : Skill() {
     override fun start() {
@@ -11,5 +14,8 @@ class GroceriesassistantSkill : Skill() {
 }
 
 fun main(args: Array<String>) {
+    createTable()
+
     Skill.main(args)
+
 }

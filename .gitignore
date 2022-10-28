@@ -7,4 +7,3 @@ build/
 /.idea
 save_flow.xml
 *.iml
-/database/data/
