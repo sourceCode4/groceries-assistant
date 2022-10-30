@@ -142,3 +142,7 @@
 2022-10-30 20:36:52.366 GMT [14248] LOG:  checkpoint complete: wrote 70 buffers (0.4%); 0 WAL file(s) added, 0 removed, 0 recycled; write=7.506 s, sync=0.023 s, total=7.584 s; sync files=30, longest=0.004 s, average=0.001 s; distance=490 kB, estimate=823 kB
 2022-10-30 20:41:44.380 GMT [14248] LOG:  checkpoint starting: time
 2022-10-30 20:41:49.423 GMT [14248] LOG:  checkpoint complete: wrote 47 buffers (0.3%); 0 WAL file(s) added, 0 removed, 0 recycled; write=4.997 s, sync=0.040 s, total=5.044 s; sync files=20, longest=0.014 s, average=0.002 s; distance=388 kB, estimate=779 kB
+2022-10-30 20:56:44.615 GMT [10900] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2022-10-30 20:56:44.625 GMT [1124] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	

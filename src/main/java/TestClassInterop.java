@@ -30,7 +30,7 @@ public class TestClassInterop {
 //                    " PRICE          FLOAT)";
 
             String sql =
-                    "CREATE TYPE diettype AS ENUM ('VEGAN', 'VEGETARIAN', 'PESCETARIAN','OMNIVORE');" +
+//                    "CREATE TYPE diettype AS ENUM ('VEGAN', 'VEGETARIAN', 'PESCETARIAN','OMNIVORE');" +
                             "CREATE TABLE USERDATA " +
                             "(NAME TEXT PRIMARY KEY NOT NULL," +
                             " HEIGHT            FLOAT, " +
