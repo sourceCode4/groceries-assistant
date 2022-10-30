@@ -15,7 +15,7 @@ public class DatabaseCreator {
 
     public static void main(String[] args) {
         //run the code below only once to set up the database the the table containing the food
-        creator();
+        //creator();
         createTable();
         inserter();
         //     query("omato");
@@ -59,16 +59,19 @@ public class DatabaseCreator {
             Statement stmt = conn.createStatement();
         ) {
             //Category, EnglishName, NEVOCode, EnergyKJ, EnergyKCAL
-            String sql = "CREATE TABLE THEFOODTEST " +
-                    "(Category VARCHAR(255) SET UTF8 COLLATE UTF8_GENERAL_CI, " +
-                    " EnglishName VARCHAR(255), " +
-                    " NEVOCode VARCHAR(255), " +
-                    " EnergyKJ VARCHAR(255), " +
-                    " EnergyKCAL VARCHAR(255)) ";
+            String sql = "CREATE TABLE Food " +
+                    "(Name VARCHAR(255), " +
+                    " Subgroup VARCHAR(255), " +
+                    " Group VARCHAR(255), " +
+                    " Diet VARCHAR(255), " +
+                    " Calories NUMERIC(1,1), " +
+                    " Protein NUMERIC(1,1), " +
+                    " Carbs NUMERIC(1,1), " +
+                    " Fat NUMERIC(1,1), "+
+                    " PRIMARY KEY (Name))";
 
             stmt.executeUpdate(sql);
 
-            String query = "ALTER";
             System.out.println("Created table in given database...");
         } catch (SQLException e) {
             e.printStackTrace();
@@ -80,7 +83,7 @@ public class DatabaseCreator {
         String username = "postgres";
         String password = "ana";
 
-        String csvFilePath = "data.csv";
+        String csvFilePath = "newdata.csv";
 
         int batchSize = 20;
 
@@ -90,8 +93,8 @@ public class DatabaseCreator {
 
             connection = DriverManager.getConnection(jdbcURL, username, password);
             connection.setAutoCommit(false);
-
-            String sql = "INSERT INTO THEFOOD (Category, EnglishName, NEVOCode, EnergyKJ, EnergyKCAL) VALUES (?, ?, ?, ?, ?)";
+            //Name, Subgroup, Group, Diet, Calories, Protein, Carbs, Fat
+            String sql = "INSERT INTO FOOD (Name, Subgroup, Group, Diet, Calories, Protein, Carbs, Fat) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement statement = connection.prepareStatement(sql);
 
             BufferedReader lineReader = new BufferedReader(new FileReader(csvFilePath));
@@ -105,19 +108,23 @@ public class DatabaseCreator {
                 System.out.println(lineText);
                 String[] data = lineText.split(",");
                 System.out.println(data);
-                String Category = data[2];
-                String EnglishName = data[5];
-                String NEVOCode = data[3];
-                String EnergyKJ = data[11];
-                String EnergyKCAL = data[12];
+                String Name = data[3];
+                String Subgroup = data[2];
+                String Group = data[1];
+                String Diet = data[0];
+                String Calories = data[6];
+                String Protein = data[7];
+                String Carbs = data[9];
+                String Fat = data[8]
 
-                statement.setString(1, Category);
-                statement.setString(2, EnglishName);
-
-                statement.setString(3, NEVOCode);
-                statement.setString(4, EnergyKJ);
-
-                statement.setString(5, EnergyKCAL);
+                statement.setString(1, Name);
+                statement.setString(2, Subgroup);
+                statement.setString(3, Group);
+                statement.setString(4, Diet);
+                statement.setString(5, Calories);
+                statement.setString(5, Protein);
+                statement.setString(5, Carbs);
+                statement.setString(5, Fat);
 
                 statement.addBatch();
 
@@ -145,10 +152,6 @@ public class DatabaseCreator {
                 e.printStackTrace();
             }
         }
-
-    }
-
-    public static void fetch(){
 
     }
 
