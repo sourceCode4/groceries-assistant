@@ -1,9 +1,11 @@
 package furhatos.app.groceriesassistant
 
 
-import TestClassInterop.createUserTable
 
 
+
+import TestClassInterop.createShoppinglist
+import TestClassInterop.createShoppinglogs
 import furhatos.app.groceriesassistant.flow.Init
 import furhatos.skills.Skill
 import furhatos.flow.kotlin.*
@@ -17,7 +19,9 @@ class GroceriesassistantSkill : Skill() {
 
 fun main(args: Array<String>) {
 
-    createUserTable()
+//    createUserTable()
+    createShoppinglist()
+    createShoppinglogs()
 
 //    inserter()
 
