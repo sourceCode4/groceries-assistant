@@ -1,4 +1,4 @@
-package furhatos.app.groceriesassistant.flow.events.control
+package furhatos.app.groceriesassistant.events.control
 
 import furhatos.event.Event
 

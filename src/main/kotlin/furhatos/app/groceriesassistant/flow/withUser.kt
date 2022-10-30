@@ -1,22 +1,26 @@
 package furhatos.app.groceriesassistant.flow
 
-import furhatos.app.groceriesassistant.flow.main.NewList
-import furhatos.app.groceriesassistant.flow.main.EditingList
+import furhatos.app.groceriesassistant.events.control.AppendGUI
+import furhatos.app.groceriesassistant.events.control.ClearGUI
 import furhatos.app.groceriesassistant.flow.main.SelectInteraction
-import furhatos.app.groceriesassistant.flow.utils.alright
-import furhatos.app.groceriesassistant.nlu.EditList
+import furhatos.app.groceriesassistant.utils.alright
 import furhatos.app.groceriesassistant.nlu.Exit
-import furhatos.app.groceriesassistant.nlu.MakeList
 import furhatos.flow.kotlin.*
+import furhatos.skills.HostedGUI
+
+private var gui = HostedGUI("gui")
 
 val WithUser: State = state(Global) {
 
-    onResponse<MakeList> { goto(NewList) }
+    onEvent<AppendGUI> { gui.append(it.message) }
 
-    onResponse<EditList> { goto(EditingList) }
+    onEvent<ClearGUI> { gui.clear() }
+
+    onReentry { furhat.listen() }
 
     onResponse<Exit> {
         furhat.say(alright)
+        gui.clear()
         goto(SelectInteraction)
     }
 }

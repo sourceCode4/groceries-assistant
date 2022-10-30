@@ -1,4 +1,4 @@
-package furhatos.app.groceriesassistant.flow.utils
+package furhatos.app.groceriesassistant.utils
 
 import furhatos.flow.kotlin.utterance
 
@@ -22,10 +22,18 @@ val alright = utterance {
     }
 }
 
-val repeat = utterance {
+val done = utterance {
     random {
-        +"would you repeat that"
-        +"can you repeat that"
-        +"come again please"
+        +"anything else"
+        +"that's it"
+        +"is that all"
+    }
+}
+
+fun howMany(it: String = "") = utterance {
+    random {
+        +"how many $it do you want?"
+        +"how many $it would you like?"
+        +"how many?"
     }
 }

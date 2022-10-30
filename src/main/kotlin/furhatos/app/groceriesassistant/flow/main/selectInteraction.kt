@@ -1,23 +1,21 @@
 package furhatos.app.groceriesassistant.flow.main
 
 import furhatos.app.groceriesassistant.flow.WithUser
-import furhatos.app.groceriesassistant.flow.events.control.AskMainQuestion
-import furhatos.app.groceriesassistant.flow.utils.alright
-import furhatos.app.groceriesassistant.nlu.DoGroceries
-import furhatos.app.groceriesassistant.nlu.EditList
-import furhatos.app.groceriesassistant.nlu.MakeList
-import furhatos.app.groceriesassistant.nlu.UpdateUserInfo
+import furhatos.app.groceriesassistant.utils.alright
+import furhatos.app.groceriesassistant.utils.askMainQuestion
+import furhatos.app.groceriesassistant.memory.Memory
+import furhatos.app.groceriesassistant.nlu.*
 import furhatos.flow.kotlin.furhat
 import furhatos.flow.kotlin.onResponse
 import furhatos.flow.kotlin.state
 
 val SelectInteraction = state(WithUser) {
-    onEntry { raise(AskMainQuestion) }
+    init { Memory.overloadCurrent() }
 
-    onEvent<AskMainQuestion> { furhat.ask("What would you like to do?") }
+    askMainQuestion("What would you like to do?")
 
     onResponse<DoGroceries> {
-        furhat.say("Do some ${it.intent.groceries}, okay")
+        furhat.say("${it.intent.buy} some ${it.intent.groceries}, okay")
         goto(NewOrExisting)
     }
 
@@ -26,8 +24,11 @@ val SelectInteraction = state(WithUser) {
     onResponse<EditList> { goto(EditingList) }
 
     onResponse<UpdateUserInfo> {
-        //TODO: edit user info
         furhat.say(alright)
-        reentry()
+        goto(UpdateUser)
+    }
+
+    onResponse(listOf(Exit(), Done())) {
+        goto(Idle)
     }
 }
