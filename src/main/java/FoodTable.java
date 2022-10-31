@@ -60,15 +60,15 @@ public class FoodTable {
         ) {
             //Category, EnglishName, NEVOCode, EnergyKJ, EnergyKCAL
             String sql = "CREATE TABLE FOOD " +
-                    "(Name VARCHAR(255), " +
+                    "(id SERIAL PRIMARY KEY," +
+                    " Name VARCHAR(255), " +
                     " Subgroup VARCHAR(255), " +
                     " Maingroup VARCHAR(255), " +
                     " Diet VARCHAR(255), " +
-                    " Calories DECIMAL(7,3), " +
-                    " Protein DECIMAL(7,3), " +
-                    " Carbs DECIMAL(7,3), " +
-                    " Fat DECIMAL(7,3), "+
-                    " PRIMARY KEY (Name))";
+                    " Calories DECIMAL(7,2), " +
+                    " Protein DECIMAL(7,2), " +
+                    " Carbs DECIMAL(7,2), " +
+                    " Fat DECIMAL(7,2)) ";
 
             stmt.executeUpdate(sql);
 
@@ -108,9 +108,9 @@ public class FoodTable {
             while ((lineText = lineReader.readLine()) != null) {
 
                 String[] data = lineText.split(",");
-                String Name = data[3];
-                String Subgroup = data[2];
-                String Maingroup = data[1];
+                String Name = data[3].replace('_', ' ');
+                String Subgroup = data[2].replace('_', ' ');
+                String Maingroup = data[1].replace('_', ' ');
                 String Diet = data[0];
                 String Calories = data[6];
                 Calories.replace(".", ",");
