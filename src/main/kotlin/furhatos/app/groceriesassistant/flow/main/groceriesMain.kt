@@ -4,12 +4,12 @@ import furhatos.app.groceriesassistant.events.control.AppendGUI
 import furhatos.app.groceriesassistant.flow.Groceries
 import furhatos.app.groceriesassistant.events.control.AskMainQuestion
 import furhatos.app.groceriesassistant.events.control.DubiousResponse
-import furhatos.app.groceriesassistant.utils.alright
+import furhatos.app.groceriesassistant.flowUtils.alright
 import furhatos.app.groceriesassistant.memory.Memory
 import furhatos.app.groceriesassistant.memory.Memory.getGroceryItems
 import furhatos.app.groceriesassistant.nlu.*
-import furhatos.app.groceriesassistant.utils.askMainQuestion
-import furhatos.app.groceriesassistant.utils.howMany
+import furhatos.app.groceriesassistant.flowUtils.askMainQuestion
+import furhatos.app.groceriesassistant.flowUtils.howMany
 import furhatos.flow.kotlin.*
 import furhatos.nlu.common.Yes
 import furhatos.nlu.common.No
@@ -33,9 +33,12 @@ val EditingList: State = state(Groceries) {
 
     onReentry {
         justGotYes = false
-        if (addedFirst)
-            furhat.ask(random("Anything else?", "Anything else you want to add?"))
-        else
+        if (addedFirst) random( {
+                goto(Recommend)
+            }, {
+                furhat.ask(random("Anything else?", "Anything else you want to add?"))
+            }
+        ) else
             furhat.ask(random(
                 "Do you want to add anything?",
                 "Anything you want to add?"), endSil = 1500, maxSpeech = 30000)

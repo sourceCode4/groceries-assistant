@@ -5,8 +5,8 @@ import furhatos.app.groceriesassistant.flow.UserInfo
 import furhatos.app.groceriesassistant.flow.WithUser
 import furhatos.app.groceriesassistant.memory.Memory
 import furhatos.app.groceriesassistant.nlu.EditUser
-import furhatos.app.groceriesassistant.utils.askMainQuestion
-import furhatos.app.groceriesassistant.utils.done
+import furhatos.app.groceriesassistant.flowUtils.askMainQuestion
+import furhatos.app.groceriesassistant.flowUtils.done
 import furhatos.flow.kotlin.furhat
 import furhatos.flow.kotlin.onResponse
 import furhatos.flow.kotlin.state

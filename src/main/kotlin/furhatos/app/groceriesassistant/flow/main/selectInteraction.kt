@@ -1,8 +1,8 @@
 package furhatos.app.groceriesassistant.flow.main
 
 import furhatos.app.groceriesassistant.flow.WithUser
-import furhatos.app.groceriesassistant.utils.alright
-import furhatos.app.groceriesassistant.utils.askMainQuestion
+import furhatos.app.groceriesassistant.flowUtils.alright
+import furhatos.app.groceriesassistant.flowUtils.askMainQuestion
 import furhatos.app.groceriesassistant.memory.Memory
 import furhatos.app.groceriesassistant.nlu.*
 import furhatos.flow.kotlin.furhat

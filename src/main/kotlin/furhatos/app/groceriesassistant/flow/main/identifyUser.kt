@@ -2,8 +2,8 @@ package furhatos.app.groceriesassistant.flow.main
 
 import furhatos.app.groceriesassistant.flow.Global
 import furhatos.app.groceriesassistant.memory.Memory
-import furhatos.app.groceriesassistant.utils.greeting
-import furhatos.app.groceriesassistant.utils.sayAndAskMain
+import furhatos.app.groceriesassistant.flowUtils.greeting
+import furhatos.app.groceriesassistant.flowUtils.sayAndAskMain
 import furhatos.flow.kotlin.*
 import furhatos.nlu.common.PersonName
 

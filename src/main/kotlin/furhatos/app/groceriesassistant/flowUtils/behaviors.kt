@@ -1,4 +1,4 @@
-package furhatos.app.groceriesassistant.utils
+package furhatos.app.groceriesassistant.flowUtils
 
 import furhatos.app.groceriesassistant.events.control.AskMainQuestion
 import furhatos.flow.kotlin.*
