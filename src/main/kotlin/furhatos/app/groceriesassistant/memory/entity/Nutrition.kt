@@ -5,7 +5,7 @@ open class Nutrition(val calories: Int,
                       val carbs: Int,
                       val fats: Int,
                       var diet: Diet)
-class MockNutrition : Nutrition(0, 0, 0, 0, Diet.OMNIVORE)
+val MockNutrition = Nutrition(0, 0, 0, 0, Diet.OMNIVORE)
 
 enum class Diet {
     VEGAN, VEGETARIAN, PESCETARIAN, OMNIVORE

@@ -3,6 +3,7 @@ package furhatos.app.groceriesassistant.flow.main
 import furhatos.app.groceriesassistant.events.control.AppendGUI
 import furhatos.app.groceriesassistant.flow.Groceries
 import furhatos.app.groceriesassistant.events.control.AskMainQuestion
+import furhatos.app.groceriesassistant.events.control.DubiousResponse
 import furhatos.app.groceriesassistant.utils.alright
 import furhatos.app.groceriesassistant.memory.Memory
 import furhatos.app.groceriesassistant.memory.Memory.getGroceryItems
@@ -28,13 +29,13 @@ val NewList = state(Groceries) {
 
     onResponse<Yes> {
         furhat.say(alright)
-        Memory.newList(true)
+        Memory.newList()
         goto(EditingList)
     }
 
     onResponse<No> {
         furhat.say(alright)
-        Memory.newList(false)
+        Memory.newList()
         goto(EditingList)
     }
 }
@@ -67,7 +68,7 @@ val EditingList: State = state(Groceries) {
     }
 
     onResponse<No> {
-        if (!justGotYes && reentryCount > 0) raise(Exit())
+        if (!justGotYes && reentryCount > 0) raise(Done())
         else propagate()
     }
 
@@ -124,13 +125,11 @@ fun HowMany(item: GroceryKind) = state(Groceries) {
         val number = it.intent.value
         when {
             number == null -> propagate()
-            number < 1     -> {
-                furhat.say("don't be silly")
-                reentry()
-            }
+            number < 1     -> raise(DubiousResponse())
             else -> terminate(number)
         }
     }
+    //onResponse(DynamicIntent(list)) {  }
     // change to quantified grocery?
     onResponse<AddGroceries> {
         val received = it.intent.groceries?.list

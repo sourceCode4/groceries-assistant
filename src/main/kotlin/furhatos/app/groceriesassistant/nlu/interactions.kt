@@ -89,13 +89,6 @@ abstract class InfoIntent(
 ) : Intent() {
     val fieldName get() = field?.text
     val hasValue get() = value != null
-    val newValue get() = if (value != null) when (fieldName) {
-        "name"   -> value.name
-        "number" -> value.number
-        "sex"    -> value.sex
-        "diet"   -> value.diet
-        else     -> null
-    } else null
     val isValid get() = value != null && with (value) {
         when (fieldName) {
             "name"   -> type == PersonName::class

@@ -36,7 +36,6 @@ val Global = state {
         val wannaTalk = furhat.askYN("Do you still want to talk?") {
             onResponse("i don't", "i do not") { terminate(false) }
             onResponse<Done> { terminate(false) }
-            onResponse { terminate(true) }
             onNoResponse { terminate(null) }
         }
         when (wannaTalk) {

@@ -14,15 +14,36 @@ class PersonName : EnumEntity(speechRecPhrases = true) {
                 name.getEnum(Language.CROATIAN)
     }
 }
-
-class UserField : EnumEntity() {
+enum class FieldEnum { HEIGHT, WEIGHT, AGE, SEX, DIET }
+class UserField : EnumEntity(stemming = true) {
     override fun getEnum(lang: Language): List<String> {
         return listOf(
-            "name",
+            //"name",
             "height:height,tall",
             "weight:weight,weigh",
             "age:age,old",
-            "sex", "diet")
+            "sex",
+            "diet")
+    }
+    override fun toText(): String {
+        return super.toText().toLowerCase()
+    }
+    val type get() = when (text) {
+        //"name" -> PersonName::class
+        "height", "weight", "age" -> Number::class
+        "sex"  -> Sex::class
+        "diet" -> Diet::class
+        else -> null
+    }
+
+    val enum get() = when (text) {
+        //"name" -> FieldEnum.NAME
+        "height" -> FieldEnum.HEIGHT
+        "weight" -> FieldEnum.WEIGHT
+        "age"    -> FieldEnum.AGE
+        "sex"    -> FieldEnum.SEX
+        "diet"   -> FieldEnum.DIET
+        else     -> null
     }
 }
 
@@ -30,7 +51,7 @@ class Sex : EnumEntity() {
     override fun getEnum(lang: Language): List<String> {
         return listOf("male", "female")
     }
-    val memoryEntity get() = when (text) {
+    val enum get() = when (text) {
         "male" -> furhatos.app.groceriesassistant.memory.entity.Sex.MALE
         "female" -> furhatos.app.groceriesassistant.memory.entity.Sex.FEMALE
         else -> null
@@ -52,17 +73,16 @@ class Diet : EnumEntity(speechRecPhrases = true) {
 }
 
 class UserFieldValue(
-    val name: PersonName? = null,
+    //val name: PersonName? = null,
     val number: Number? = null,
     val sex: Sex? = null,
     val diet: Diet? = null
 ) : ComplexEnumEntity() {
     override fun getEnum(lang: Language): List<String> {
-        return listOf("@name", "@number", "@sex", "@diet")
+        return listOf(/*"@name", */"@number", "@sex", "@diet")
     }
-
     val type get() = when {
-        name != null -> PersonName::class
+        //name != null -> PersonName::class
         number != null -> Number::class
         sex != null -> Sex::class
         diet != null -> Diet::class

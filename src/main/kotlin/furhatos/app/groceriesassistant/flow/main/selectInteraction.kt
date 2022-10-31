@@ -8,11 +8,17 @@ import furhatos.app.groceriesassistant.nlu.*
 import furhatos.flow.kotlin.furhat
 import furhatos.flow.kotlin.onResponse
 import furhatos.flow.kotlin.state
+import furhatos.flow.kotlin.utterance
 
 val SelectInteraction = state(WithUser) {
     init { Memory.overloadCurrent() }
 
-    askMainQuestion("What would you like to do?")
+    askMainQuestion(utterance {
+        random {
+            +"what can i do for you?"
+            +"what do you want to do?"
+        }
+    })
 
     onResponse<DoGroceries> {
         furhat.say("${it.intent.buy} some ${it.intent.groceries}, okay")

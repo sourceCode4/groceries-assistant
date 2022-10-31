@@ -3,7 +3,8 @@ package furhatos.app.groceriesassistant.utils
 import furhatos.app.groceriesassistant.events.control.AskMainQuestion
 import furhatos.flow.kotlin.*
 
-fun StateBuilder.askMainQuestion(question: String) = askMainQuestion(utterance { +question })
+fun StateBuilder.askMainQuestion(question: String) =
+    askMainQuestion(utterance { +question })
 
 fun StateBuilder.askMainQuestion(question: Utterance) {
     onEntry { raise(AskMainQuestion) }
