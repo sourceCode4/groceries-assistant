@@ -2,7 +2,9 @@ package furhatos.app.groceriesassistant.flow.main
 
 import furhatos.app.groceriesassistant.flow.Global
 import furhatos.app.groceriesassistant.events.control.*
+import furhatos.app.groceriesassistant.flow.UserInfo
 import furhatos.app.groceriesassistant.memory.Memory
+import furhatos.app.groceriesassistant.utils.sayAndAskMain
 import furhatos.flow.kotlin.furhat
 import furhatos.flow.kotlin.onNoResponse
 import furhatos.flow.kotlin.onResponse
@@ -11,12 +13,10 @@ import furhatos.nlu.common.No
 import furhatos.nlu.common.Yes
 
 fun NewUser(name: String) = state(Global) {
-    onEntry {
-        furhat.say("hi! nice to meet you $name!")
-        raise(AskMainQuestion)
-    }
 
-    onEvent<AskMainQuestion> { furhat.ask("I will ask you for some basic information, is that alright?") }
+    sayAndAskMain(
+        "hi! nice to meet you $name!",
+        "I will ask you for some basic information, is that alright?")
 
     onResponse<Yes> {
         furhat.say("Great!")
@@ -57,12 +57,23 @@ fun NewUser(name: String) = state(Global) {
 }
 
 fun GatherInfo(name: String) = state(Global) {
+
+    include(UserInfo)
+
     onEntry {
-        Memory.initUser()
+        Memory.initUser(name)
         raise(AskHeight())
-        raise(AskWeight())
-        raise(AskAge())
-        raise(AskSex())
-        raise(AskDiet())
+    }
+    onEvent<GotHeight> { raise(AskWeight()) }
+
+    onEvent<GotWeight> { raise(AskAge()) }
+
+    onEvent<GotAge> { raise(AskSex()) }
+
+    onEvent<GotSex> { raise(AskDiet()) }
+
+    onEvent<GotDiet> {
+        furhat.say("perfect, i am ready to compose your first list!")
+        goto(SelectInteraction)
     }
 }

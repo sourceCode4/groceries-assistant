@@ -1,32 +1,16 @@
 package furhatos.app.groceriesassistant
 
-
-
-
-
-import FoodTable.runner
-import TestClassInterop.createShoppinglist
-import TestClassInterop.createShoppinglogs
-import TestClassInterop.createUserTable
-import furhatos.app.groceriesassistant.flow.Init
+import furhatos.app.groceriesassistant.flow.main.SelectInteraction
 import furhatos.skills.Skill
 import furhatos.flow.kotlin.*
 
 
 class GroceriesassistantSkill : Skill() {
     override fun start() {
-        Flow().run(Init)
+        Flow().run(SelectInteraction)
     }
 }
 
 fun main(args: Array<String>) {
-
-        runner()
-//    createUserTable()
-//    createShoppinglist()
-//    createShoppinglogs()
-
-//    inserter()
-
     Skill.main(args)
 }

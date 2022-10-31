@@ -10,6 +10,13 @@ abstract class AskInfo : Event()
 class AskName : AskInfo()
 class AskHeight : AskInfo()
 class AskWeight : AskInfo()
+
 class AskAge : AskInfo()
 class AskSex : AskInfo()
 class AskDiet : AskInfo()
+
+class GotHeight : AskInfo()
+class GotWeight : AskInfo()
+class GotAge : AskInfo()
+class GotSex : AskInfo()
+class GotDiet : AskInfo()

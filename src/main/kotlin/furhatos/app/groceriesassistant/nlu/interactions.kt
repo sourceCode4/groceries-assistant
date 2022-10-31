@@ -2,6 +2,7 @@ package furhatos.app.groceriesassistant.nlu
 
 import furhatos.nlu.Intent
 import furhatos.nlu.common.Number
+import furhatos.nlu.common.PersonName
 import furhatos.util.Language
 
 class AddGroceries(
@@ -20,7 +21,7 @@ class AddGroceries(
 
 class DoGroceries(
     val groceries: GroceriesSynonym? = null,
-    val buy: BuySynonym? = BuySynonym()
+    val buy: BuySynonym? = null
 ) : Intent() {
     override fun getExamples(lang: Language): List<String> {
         return listOf(
