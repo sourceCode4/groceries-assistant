@@ -1,11 +1,12 @@
-import furhatos.app.groceriesassistant.memory.entity.Grocery;
-import furhatos.app.groceriesassistant.memory.entity.User;
+import furhatos.app.groceriesassistant.memory.entity.*;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class Queries {
     public static User getUser(String name) {
@@ -23,16 +24,33 @@ public class Queries {
 
             stmt = c.createStatement();
 
-
             String sql =
-                    "INSERT INTO USERFOODTABLE(id, FOODKEY, COUNT, PREF)" +
-                            "SELECT (SELECT id FROM userdata WHERE userdata.name = '" + x + "'), id, 0 as COUNT, 1 as PREF FROM FOOD";
+                    "SELECT *  FROM USERDATA WHERE userdata.name = '" + name +"'";
 
+            ResultSet rs = stmt.executeQuery(sql);
 
+            if (rs.next() == false){
+                return null;
+            }
+            rs.next();
 
-            stmt.executeUpdate(sql);
+            String username = rs.getString(2);
+
+            int height = Integer.parseInt(rs.getString(3));
+            int weight = Integer.parseInt(rs.getString(4));
+            int age = Integer.parseInt(rs.getString(5));
+            Sex sex = Objects.equals(rs.getString(6), "MALE") ? Sex.MALE : Sex.FEMALE;
+
+            Nutrition nutrition = new Nutrition(-1,-1,-1,-1, Diet.VEGAN);
+
+            User user =new User(username,height,weight,age,sex,nutrition);
+
+            System.out.println(user);
+
             stmt.close();
             c.close();
+
+            return user;
 
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
@@ -48,10 +66,89 @@ public class Queries {
     public static void updateUser(User user) {
         //TODO:update the age, weight, height, sex and diet
         //assume it is an existing user
+        String name = user.getName();
+        int age = user.getAge();
+        int weight = user.getWeight();
+        int height = user.getHeight();
+        String sex= user.getSex().toString();
+        Diet diet = user.getNutrition().getDiet();
+
+        Connection c = null;
+        Statement stmt = null;
+        try {
+            Class.forName("org.postgresql.Driver");
+            c = DriverManager
+                    .getConnection("jdbc:postgresql://localhost:5432/test",
+                            "postgres", "TO BE ADDED"); //Please use your own postgreSQL password
+            System.out.println("connected");
+
+
+            stmt = c.createStatement();
+
+            String sql =
+                    "UPDATE userdata SET (age, weight, height, sex,diet) = ('" + age + "', '" + weight + "','" + height + "','" + sex + "','" + diet + "')" +
+                     "WHERE name = '" + name + "'";
+
+
+
+            stmt.executeUpdate(sql);
+            stmt.close();
+            c.close();
+
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            System.exit(0);
+        }
+
+
+
     }
 
     public static void addNewUser(User user) {
         //TODO:add this new user to the database
+        String name = user.getName();
+        int age = user.getAge();
+        int weight = user.getWeight();
+        int height = user.getHeight();
+        String sex= user.getSex().toString();
+        int calories = user.getNutrition().getCalories();
+        int protein = user.getNutrition().getProtein();
+        int carbs = user.getNutrition().getCarbs();
+        int fats = user.getNutrition().getFats();
+        Diet diet = user.getNutrition().getDiet();
+
+
+        Connection c = null;
+        Statement stmt = null;
+        try {
+            Class.forName("org.postgresql.Driver");
+            c = DriverManager
+                    .getConnection("jdbc:postgresql://localhost:5432/test",
+                            "postgres", "TO BE ADDED"); //Please use your own postgreSQL password
+            System.out.println("connected");
+
+
+            stmt = c.createStatement();
+
+//            INSERT INTO userdata(name, age, weight, height, sex, calories, protein, carbs, fats, diet)
+//            VALUES (5,5,5,5,'FEMALE',5,5,5,5,'VEGAN');
+
+            String sql =
+                    "INSERT INTO userdata(name, age, weight, height, sex, calories, protein, carbs, fats, diet)" +
+                            "VALUES ('" + name + "','" + age + "','" + weight + "','" + height + "','" + sex + "','" + calories +"','" + protein + "','" + carbs + "','" + fats + "','" + diet + "')";
+
+
+
+            stmt.executeUpdate(sql);
+            stmt.close();
+            c.close();
+
+            TestClassInterop.addUserFoodTable(name);
+
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            System.exit(0);
+        }
     }
 
     public static HashMap<Grocery, Integer> currentList(String userName) {
