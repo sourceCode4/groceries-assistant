@@ -11,6 +11,9 @@ fun StateBuilder.askMainQuestion(question: Utterance) {
     onEvent<AskMainQuestion> { furhat.ask(question) }
 }
 
+fun StateBuilder.sayAndAskMain(state: String, question: String) {
+    sayAndAskMain(utterance { +state }, question)
+}
 fun StateBuilder.sayAndAskMain(utterance: Utterance, question: String) {
     onEntry {
         furhat.say(utterance)

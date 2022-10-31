@@ -2,7 +2,8 @@ package furhatos.app.groceriesassistant.memory
 
 import Queries
 import furhatos.app.groceriesassistant.memory.entity.Grocery
-import furhatos.app.groceriesassistant.memory.entity.MockNutrition
+import furhatos.app.groceriesassistant.memory.entity.EmptyNutrition
+import furhatos.app.groceriesassistant.memory.entity.Nutrition
 import furhatos.app.groceriesassistant.memory.entity.User
 import furhatos.app.groceriesassistant.nlu.FieldEnum
 import furhatos.app.groceriesassistant.nlu.GroceryKind
@@ -17,6 +18,11 @@ object Memory {
         val shoppingList: MutableMap<Grocery, Int> = mutableMapOf()
     }
 
+    fun initUser(name: String) {
+        state.user = User(name = name)
+        state.user.nutrition = EmptyNutrition
+    }
+
     /**
      *  If a user under @name exists sets it to current and returns true,
      *  otherwise returns false
@@ -29,8 +35,6 @@ object Memory {
         } else
             false
     }
-
-
     fun updateUser(field: FieldEnum?, value: UserFieldValue): Boolean {
         with (state.user) {
             when (field) {
@@ -85,8 +89,8 @@ object Memory {
         val grocery = this.text
         //TODO: search the database
         return listOf(
-            Grocery(0, "generic banana", "banana", MockNutrition),
-            Grocery(1,  "generic $grocery", this.category?.text!!, MockNutrition))
+            Grocery(0, "generic banana", "banana", EmptyNutrition),
+            Grocery(1,  "generic $grocery", this.category?.text!!, EmptyNutrition))
     }
 
     fun getPreferenceVector() {

@@ -1,5 +1,7 @@
 import furhatos.app.groceriesassistant.memory.entity.*;
 
+import java.sql.*;
+import java.util.ArrayList;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -160,16 +162,38 @@ public class Queries {
         //TODO: overwrite the current shopping list in the database with the new list
     }
 
+    public static List<String> getCategories() {
+        //TODO: return all the category values
+        return null;
+    }
+
     public static List<Grocery> searchGroceries(String userName, String input) {
         //TODO: return the list of groceries that match the input,
         // ordered by this user's preference
         return null;
     }
 
-    public static float[] getPreferenceVector(String userName) {
+    public static ArrayList<Float> getPreferenceVector(String userName) {
         //TODO: return this user's preference array,
         // with each index matching the primary key of the food
-        return null;
+        String DB_URL = "";
+        String USER = "";
+        String PASS = "";
+        String query = "SELECT Preference FROM (TABLE NAME) WHERE Username LIKE " + userName +" ORDER BY Foodname";
+        ArrayList<Float> list = new ArrayList<>();
+        try(Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+        ) {
+            while(rs.next()){
+                //Display values
+                System.out.print("Preference: " + rs.getString("Preference"));
+                list.add(Float.valueOf(rs.getString("Preference")));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 
     public static void setPreferenceVector(String userName, float[] prefs) {

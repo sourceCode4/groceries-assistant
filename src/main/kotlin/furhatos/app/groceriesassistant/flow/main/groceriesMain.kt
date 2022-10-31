@@ -17,24 +17,6 @@ import furhatos.nlu.common.Number
 
 val NewList = state(Groceries) {
     onEntry {
-        if (Memory.currentList().isEmpty())
-            goto(EditingList)
-        else
-            raise(AskMainQuestion)
-    }
-
-    onEvent<AskMainQuestion> {
-        furhat.ask("Do you wish to archive the current list?")
-    }
-
-    onResponse<Yes> {
-        furhat.say(alright)
-        Memory.newList()
-        goto(EditingList)
-    }
-
-    onResponse<No> {
-        furhat.say(alright)
         Memory.newList()
         goto(EditingList)
     }
