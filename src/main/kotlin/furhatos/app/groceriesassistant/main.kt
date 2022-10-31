@@ -4,13 +4,16 @@ package furhatos.app.groceriesassistant
 
 
 
-import FoodTable.runner
-import TestClassInterop.createShoppinglist
-import TestClassInterop.createShoppinglogs
-import TestClassInterop.createUserTable
+import Queries.addNewUser
+import Queries.updateUser
+import TestClassInterop.*
 import furhatos.app.groceriesassistant.flow.Init
-import furhatos.skills.Skill
+import furhatos.app.groceriesassistant.memory.entity.Diet
+import furhatos.app.groceriesassistant.memory.entity.Nutrition
+import furhatos.app.groceriesassistant.memory.entity.Sex
+import furhatos.app.groceriesassistant.memory.entity.User
 import furhatos.flow.kotlin.*
+import furhatos.skills.Skill
 
 
 class GroceriesassistantSkill : Skill() {
@@ -21,12 +24,20 @@ class GroceriesassistantSkill : Skill() {
 
 fun main(args: Array<String>) {
 
-        runner()
-//    createUserTable()
-//    createShoppinglist()
-//    createShoppinglogs()
+//    val a: String = "c"
+//    getUser(a);
 
-//    inserter()
+    val username: String = "d"
+
+    val height: Int = 6
+    val weight: Int = 6
+    val age: Int = 6
+    val sex = Sex.FEMALE
+
+    val nutrition = Nutrition(-1, -1, -1, -1, Diet.VEGAN)
+
+    val user = User(username, height, weight, age, sex, nutrition)
+    addNewUser(user)
 
     Skill.main(args)
 }
