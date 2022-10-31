@@ -29,6 +29,11 @@ public class Queries {
         //TODO: overwrite the current shopping list in the database with the new list
     }
 
+    public static List<String> getCategories() {
+        //TODO: return all the category values
+        return null;
+    }
+
     public static List<Grocery> searchGroceries(String userName, String input) {
         //TODO: return the list of groceries that match the input,
         // ordered by this user's preference
