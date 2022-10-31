@@ -1,17 +1,19 @@
 package furhatos.app.groceriesassistant.memory
 
+import Queries
 import furhatos.app.groceriesassistant.memory.entity.Grocery
 import furhatos.app.groceriesassistant.memory.entity.MockNutrition
 import furhatos.app.groceriesassistant.memory.entity.User
 import furhatos.app.groceriesassistant.nlu.FieldEnum
 import furhatos.app.groceriesassistant.nlu.GroceryKind
 import furhatos.app.groceriesassistant.nlu.UserFieldValue
-import furhatos.nlu.common.Date
 
 object Memory {
 
     private val state = object {
         lateinit var user: User
+        val userName get() = user.name
+
         val shoppingList: MutableMap<Grocery, Int> = mutableMapOf()
     }
 
@@ -20,8 +22,12 @@ object Memory {
      *  otherwise returns false
      */
     fun setUser(name: String): Boolean {
-        //TODO: return the user from the database or return null if no user
-        return true
+        val user = Queries.getUser(name)
+        return if (user != null) {
+            state.user = user
+            true
+        } else
+            false
     }
 
 
@@ -40,19 +46,17 @@ object Memory {
         return true
     }
 
-    fun commitUser() = {
-        val user = state.user //user this as the user information
-        /*TODO: update the personal information of the user in the database
-            -> can only be age, height, weight, sex, diet
-        **/
+    fun commitUser() {
+        val user = state.user
+        Queries.updateUser(user)
     }
 
     /**
      *  Sets the new user to current and adds them to the database.
      */
     fun setNewUser(user: User) {
+        Queries.addNewUser(user)
         state.user = user
-        //TODO: adds this user to the database
     }
 
     /**
@@ -86,11 +90,11 @@ object Memory {
     }
 
     fun getPreferenceVector() {
-
+        Queries.getPreferenceVector(state.userName)
     }
 
     fun setPreferenceVector() {
-
+        //TODO: return array of preferences
     }
 
     fun currentList(): MutableMap<Grocery, Int> = state.shoppingList
