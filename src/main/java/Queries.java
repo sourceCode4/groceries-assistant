@@ -1,6 +1,9 @@
 import furhatos.app.groceriesassistant.memory.entity.Grocery;
 import furhatos.app.groceriesassistant.memory.entity.User;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.List;
 
@@ -8,6 +11,37 @@ public class Queries {
     public static User getUser(String name) {
         //TODO: if the user with this name exists, return that,
         //  otherwise return null
+        Connection c = null;
+        Statement stmt = null;
+        try {
+            Class.forName("org.postgresql.Driver");
+            c = DriverManager
+                    .getConnection("jdbc:postgresql://localhost:5432/test",
+                            "postgres", "TO BE ADDED"); //Please use your own postgreSQL password
+            System.out.println("connected");
+
+
+            stmt = c.createStatement();
+
+
+            String sql =
+                    "INSERT INTO USERFOODTABLE(id, FOODKEY, COUNT, PREF)" +
+                            "SELECT (SELECT id FROM userdata WHERE userdata.name = '" + x + "'), id, 0 as COUNT, 1 as PREF FROM FOOD";
+
+
+
+            stmt.executeUpdate(sql);
+            stmt.close();
+            c.close();
+
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            System.exit(0);
+        }
+
+        System.out.println("Opened database successfully");
+        System.out.println("Table created successfully");
+
         return null;
     }
 
