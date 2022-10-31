@@ -5,13 +5,14 @@ package furhatos.app.groceriesassistant.memory.entity
  * the database (long-term memory) user entry
  */
 data class User(
-    var name: String,
-    var height: Int,
-    var weight: Int,
-    var age: Int,
-    var sex: Sex,
-    var nutrition: Nutrition
+    var name: String = "",
+    var height: Int = -1,
+    var weight: Int = -1,
+    var age: Int = -1
 ) {
+    lateinit var sex: Sex
+    lateinit var nutrition: Nutrition
+
     fun getDailyCalories(): Double = when (sex) {
         Sex.FEMALE -> 655 + 9.6 * weight + 1.8 * height - 4.7 * age
         Sex.MALE   -> 66 + 13.7 * weight + 5 * height - 6.8 * age

@@ -13,7 +13,7 @@ public class Queries {
 
     public static void updateUser(User user) {
         //TODO:update the age, weight, height, sex and diet
-        //assume it is an existing user
+        // assume it is an existing user
     }
 
     public static void addNewUser(User user) {

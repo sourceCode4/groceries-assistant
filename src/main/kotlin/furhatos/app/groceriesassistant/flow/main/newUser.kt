@@ -2,6 +2,7 @@ package furhatos.app.groceriesassistant.flow.main
 
 import furhatos.app.groceriesassistant.flow.Global
 import furhatos.app.groceriesassistant.events.control.*
+import furhatos.app.groceriesassistant.memory.Memory
 import furhatos.flow.kotlin.furhat
 import furhatos.flow.kotlin.onNoResponse
 import furhatos.flow.kotlin.onResponse
@@ -57,6 +58,7 @@ fun NewUser(name: String) = state(Global) {
 
 fun GatherInfo(name: String) = state(Global) {
     onEntry {
+        Memory.initUser()
         raise(AskHeight())
         raise(AskWeight())
         raise(AskAge())

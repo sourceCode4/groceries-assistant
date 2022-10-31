@@ -17,6 +17,10 @@ object Memory {
         val shoppingList: MutableMap<Grocery, Int> = mutableMapOf()
     }
 
+    fun initUser() {
+        state.user = User()
+    }
+
     /**
      *  If a user under @name exists sets it to current and returns true,
      *  otherwise returns false
@@ -29,8 +33,6 @@ object Memory {
         } else
             false
     }
-
-
     fun updateUser(field: FieldEnum?, value: UserFieldValue): Boolean {
         with (state.user) {
             when (field) {

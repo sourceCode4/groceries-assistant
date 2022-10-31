@@ -39,14 +39,17 @@ fun GetFieldValue(field: FieldEnum) = state(WithUser) {
         FieldEnum.HEIGHT,
         FieldEnum.WEIGHT,
         FieldEnum.AGE -> onResponse<Number> {
-            Memory.updateUser(
-                field, UserFieldValue(number = it.intent))
+            if (!Memory.updateUser(
+                field, UserFieldValue(number = it.intent)))
+                propagate()
         }
         FieldEnum.SEX -> onResponse<Sex> {
-            Memory.updateUser(FieldEnum.SEX, UserFieldValue(sex = it.intent))
+            if (!Memory.updateUser(FieldEnum.SEX, UserFieldValue(sex = it.intent)))
+                propagate()
         }
         FieldEnum.DIET -> onResponse<Diet> {
-            Memory.updateUser(FieldEnum.DIET, UserFieldValue(diet = it.intent))
+            if(!Memory.updateUser(FieldEnum.DIET, UserFieldValue(diet = it.intent)))
+                propagate()
         }
     }
 }
