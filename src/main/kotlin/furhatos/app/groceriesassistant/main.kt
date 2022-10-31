@@ -4,8 +4,7 @@ package furhatos.app.groceriesassistant
 
 
 
-import Queries.addNewUser
-import Queries.updateUser
+import Queries.*
 import TestClassInterop.*
 import furhatos.app.groceriesassistant.flow.Init
 import furhatos.app.groceriesassistant.memory.entity.Diet
@@ -27,17 +26,19 @@ fun main(args: Array<String>) {
 //    val a: String = "c"
 //    getUser(a);
 
-    val username: String = "d"
-
-    val height: Int = 6
-    val weight: Int = 6
-    val age: Int = 6
-    val sex = Sex.FEMALE
-
-    val nutrition = Nutrition(-1, -1, -1, -1, Diet.VEGAN)
-
-    val user = User(username, height, weight, age, sex, nutrition)
-    addNewUser(user)
+//    val username: String = "a"
+//
+//    val height: Int = 6
+//    val weight: Int = 6
+//    val age: Int = 6
+//    val sex = Sex.FEMALE
+//
+//    val nutrition = Nutrition(-1, -1, -1, -1, Diet.VEGAN)
+//
+//    val user = User(username, height, weight, age, sex, nutrition)
+//
+//
+//    getPreferenceVector(username)
 
     Skill.main(args)
 }

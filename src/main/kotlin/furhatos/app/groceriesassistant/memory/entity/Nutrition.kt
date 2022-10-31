@@ -10,3 +10,5 @@ val EmptyNutrition = Nutrition(0, 0, 0, 0, Diet.OMNIVORE)
 enum class Diet {
     VEGAN, VEGETARIAN, PESCETARIAN, OMNIVORE
 }
+
+

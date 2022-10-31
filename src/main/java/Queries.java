@@ -1,7 +1,7 @@
 import furhatos.app.groceriesassistant.memory.entity.*;
 
 import java.sql.*;
-import java.util.ArrayList;
+import java.util.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -155,16 +155,117 @@ public class Queries {
 
     public static HashMap<Grocery, Integer> currentList(String userName) {
         //TODO: return current users shopping list
-        return null;
+/*        SELECT food.id, name, subgroup, calories, protein, carbs, fat, diet, count FROM userfoodtable
+            JOIN food ON userfoodtable.foodkey = food.id
+            WHERE userfoodtable.id = (select id from userdata where name = 'a') AND count > 0 */
+
+        Connection c = null;
+        Statement stmt = null;
+        HashMap<Grocery, Integer> list = null;
+        try {
+            Class.forName("org.postgresql.Driver");
+            c = DriverManager
+                    .getConnection("jdbc:postgresql://localhost:5432/test",
+                            "postgres", "TO BE ADDED"); //Please use your own postgreSQL password
+            System.out.println("connected");
+
+
+            stmt = c.createStatement();
+
+            String sql =
+                    "SELECT food.id, name, subgroup, calories, protein, carbs, fat, diet, count FROM userfoodtable" +
+                            "            JOIN food ON userfoodtable.foodkey = food.id" +
+                            "            WHERE userfoodtable.id = (select id from userdata where name = 'a') AND count > 0";
+
+//            ResultSet rs = stmt.executeQuery(sql);
+//            rs.next();
+//            System.out.println(rs.getObject(8));
+
+//            AND count > 0
+
+            list = new HashMap<Grocery, Integer>();
+            ResultSet rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                int id = rs.getInt(1);
+                String name = rs.getString(2);
+                String subgrounp = rs.getString(3);
+                String temp = rs.getObject(8).toString();
+
+                if (temp.equals("Vegan")) {
+                    Nutrition nutrition = new Nutrition(rs.getInt(4), rs.getInt(5), rs.getInt(6), rs.getInt(7), Diet.VEGAN);
+                    Grocery grocery = new Grocery(id, name, subgrounp, nutrition);
+                    list.put(grocery, rs.getInt(9));
+                } else if (temp.equals("Vegetarian")) {
+                    Nutrition nutrition = new Nutrition(rs.getInt(4), rs.getInt(5), rs.getInt(6), rs.getInt(7), Diet.VEGETARIAN);
+                    Grocery grocery = new Grocery(id, name, subgrounp, nutrition);
+                    list.put(grocery, rs.getInt(9));
+                } else if (temp.equals("Pescaterian")) {
+                    Nutrition nutrition = new Nutrition(rs.getInt(4), rs.getInt(5), rs.getInt(6), rs.getInt(7), Diet.PESCETARIAN);
+                    Grocery grocery = new Grocery(id, name, subgrounp, nutrition);
+                    list.put(grocery, rs.getInt(9));
+                } else if (temp.equals("Omnivore")) {
+                    Nutrition nutrition = new Nutrition(rs.getInt(4), rs.getInt(5), rs.getInt(6), rs.getInt(7), Diet.OMNIVORE);
+                    Grocery grocery = new Grocery(id, name, subgrounp, nutrition);
+                    list.put(grocery, rs.getInt(9));
+
+                }
+            }
+
+//            System.out.println(list);
+
+            stmt.close();
+            c.close();
+
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            System.exit(0);
+        }
+
+        return list;
     }
 
     public static void overwriteList(String userName, HashMap<Grocery, Integer> newList) {
         //TODO: overwrite the current shopping list in the database with the new list
-    }
 
-    public static List<String> getCategories() {
-        //TODO: return all the category values
-        return null;
+
+        Connection c = null;
+        Statement stmt = null;
+        try {
+            Class.forName("org.postgresql.Driver");
+            c = DriverManager
+                    .getConnection("jdbc:postgresql://localhost:5432/test",
+                            "postgres", "TO BE ADDED"); //Please use your own postgreSQL password
+            System.out.println("connected");
+
+
+
+
+            Iterator<HashMap.Entry<Grocery, Integer>> iterator = newList.entrySet().iterator();
+            while(iterator.hasNext()){
+                stmt = c.createStatement();
+                Map.Entry<Grocery, Integer> entry = iterator.next();
+                Grocery grocery = entry.getKey();
+                int count = entry.getValue();
+                int foodId = grocery.getId();
+
+                String sql =
+
+                        "UPDATE userfoodtable SET count = '"+count+"'" +
+
+                                "WHERE id IN (SELECT id FROM userdata WHERE userdata.name = '" + userName + "') AND userfoodtable.foodkey = '" + foodId + "' ";
+
+
+
+                stmt.executeUpdate(sql);
+                stmt.close();
+            }
+
+            c.close();
+
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            System.exit(0);
+        }
     }
 
     public static List<Grocery> searchGroceries(String userName, String input) {
