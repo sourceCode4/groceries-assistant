@@ -11,7 +11,9 @@ import furhatos.flow.kotlin.state
 import furhatos.flow.kotlin.utterance
 
 val SelectInteraction = state(WithUser) {
-    init { Memory.overloadCurrent() }
+    init {
+        Memory.overloadCurrent()
+    }
 
     askMainQuestion(utterance {
         random {
@@ -21,13 +23,20 @@ val SelectInteraction = state(WithUser) {
     })
 
     onResponse<DoGroceries> {
-        furhat.say("${it.intent.buy} some ${it.intent.groceries}, okay")
-        goto(NewOrExisting)
+        if (it.intent.buy != null)
+            furhat.say("${it.intent.buy} some ${it.intent.groceries}, okay")
+        else {
+            furhat.say("${it.intent.groceries}, sure")
+        }
+        if (Memory.currentList().isNotEmpty())
+            goto(NewOrExisting)
+        else
+            goto(NewList)
     }
 
     onResponse<MakeList> { goto(NewList) }
 
-    onResponse<EditList> { goto(EditingList) }
+  //  onResponse<EditList> { goto(EditingList) }
 
     onResponse<UpdateUserInfo> {
         furhat.say(alright)
