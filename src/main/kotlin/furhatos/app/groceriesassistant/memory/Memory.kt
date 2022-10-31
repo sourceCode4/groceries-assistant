@@ -1,21 +1,18 @@
 package furhatos.app.groceriesassistant.memory
 
 import furhatos.app.groceriesassistant.memory.entity.Grocery
+import furhatos.app.groceriesassistant.memory.entity.MockNutrition
 import furhatos.app.groceriesassistant.memory.entity.User
-import furhatos.app.groceriesassistant.nlu.GroceryKindEntity
+import furhatos.app.groceriesassistant.nlu.FieldEnum
+import furhatos.app.groceriesassistant.nlu.GroceryKind
+import furhatos.app.groceriesassistant.nlu.UserFieldValue
 import furhatos.nlu.common.Date
-import java.time.LocalDate
 
 object Memory {
 
     private val state = object {
         lateinit var user: User
-        /**
-         *  for how many days the groceries should last, max 7
-         *  use this to calculate the required amount of groceries when composing a list
-         */
-        var duration: Int = 0
-        var shoppingList: MutableMap<Grocery, Int> = mutableMapOf()
+        val shoppingList: MutableMap<Grocery, Int> = mutableMapOf()
     }
 
     /**
@@ -23,54 +20,47 @@ object Memory {
      *  otherwise returns false
      */
     fun setUser(name: String): Boolean {
-        //TODO
+        //TODO: return the user from the database or return null if no user
         return true
     }
 
-    fun getUser(): User = state.user
+
+    fun updateUser(field: FieldEnum?, value: UserFieldValue): Boolean {
+        with (state.user) {
+            when (field) {
+                //"name" -> name = value.name?.text ?: return false
+                FieldEnum.HEIGHT -> height = value.number?.value ?: return false
+                FieldEnum.WEIGHT -> weight = value.number?.value ?: return false
+                FieldEnum.AGE  -> age = value.number?.value ?: return false
+                FieldEnum.SEX  -> sex = value.sex?.enum ?: return false
+                FieldEnum.DIET -> nutrition.diet = value.diet?.memoryEntity ?: return false
+                else -> return false
+            }
+        }
+        return true
+    }
+
+    fun commitUser() = {
+        val user = state.user //user this as the user information
+        /*TODO: update the personal information of the user in the database
+            -> can only be age, height, weight, sex, diet
+        **/
+    }
 
     /**
      *  Sets the new user to current and adds them to the database.
      */
     fun setNewUser(user: User) {
-        //TODO
-    }
-
-    fun addItem(item: Grocery, amount: Int = 1) {
-        state.shoppingList[item] = (state.shoppingList[item] ?: 0) + amount
+        state.user = user
+        //TODO: adds this user to the database
     }
 
     /**
-     *  Returns true if there was an entry with this item in the list
+     * Loads user's current list from the database.
      */
-    fun removeItem(item: Grocery): Boolean {
-        return state.shoppingList.remove(item) != null
-    }
-
-    fun newList(archiveCurrent: Boolean) {
-        if (archiveCurrent) {
-            //TODO: save current list to the database
-        }
-        state.shoppingList.clear()
-    }
-
-    /**
-     *  Return the list from the given date, if it doesn't exist return null
-     */
-    fun retrieveList(dateEntity: Date): List<Grocery>? {
-        val date = dateEntity.asLocalDate() ?: return null
-        //TODO: use the date to retrieve from the database
-        return null
-    }
-
-    /**
-     *  Forgets the list and returns true if it exists,
-     *  false otherwise
-     */
-    fun forgetList(dateEntity: Date): Boolean {
-        val date = dateEntity.asLocalDate() ?: return false
-        //TODO: forget the list or return false if there is none
-        return true
+    fun overloadCurrent() {
+        //val name = state.user.name
+        //TODO: return current shopping list (in hash map of grocery objects to ints)
     }
 
     /**
@@ -79,7 +69,7 @@ object Memory {
      */
     fun commit(): Boolean {
         if (state.shoppingList.isEmpty()) return false
-        //TODO: commit the current list to the database
+        //TODO: put a shopping list into the database
         return true
     }
 
@@ -87,9 +77,36 @@ object Memory {
      *  Retrieves grocery items from the database that match the grocery entity
      *  asked for by the user
      */
-    fun getGroceryItems(entity: GroceryKindEntity): List<Grocery> {
-        val grocery = entity.text
-        //TODO: search the database for the text
-        return listOf()
+    fun GroceryKind.getGroceryItems(): List<Grocery> {
+        val grocery = this.text
+        //TODO: search the database
+        return listOf(
+            Grocery(0, "generic banana", "banana", MockNutrition),
+            Grocery(1,  "generic $grocery", this.category?.text!!, MockNutrition))
+    }
+
+    fun getPreferenceVector() {
+
+    }
+
+    fun setPreferenceVector() {
+
+    }
+
+    fun currentList(): MutableMap<Grocery, Int> = state.shoppingList
+
+    fun addItem(item: Grocery, amount: Int = 1) {
+        state.shoppingList[item] = (state.shoppingList[item] ?: 0) + amount
+    }
+
+    fun newList() {
+        state.shoppingList.clear()
+    }
+
+    /**
+     *  Returns true if there was an entry with this item in the list
+     */
+    fun removeItem(item: Grocery): Boolean {
+        return state.shoppingList.remove(item) != null
     }
 }

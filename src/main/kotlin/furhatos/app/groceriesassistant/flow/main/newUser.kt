@@ -1,8 +1,7 @@
 package furhatos.app.groceriesassistant.flow.main
 
 import furhatos.app.groceriesassistant.flow.Global
-import furhatos.app.groceriesassistant.flow.WithUser
-import furhatos.app.groceriesassistant.flow.events.control.AskMainQuestion
+import furhatos.app.groceriesassistant.events.control.*
 import furhatos.flow.kotlin.furhat
 import furhatos.flow.kotlin.onNoResponse
 import furhatos.flow.kotlin.onResponse
@@ -24,10 +23,12 @@ fun NewUser(name: String) = state(Global) {
     }
 
     onResponse<No> {
-        val areYouSure = state(WithUser) {
+        val areYouSure = state(Global) {
             var noResponse = 0
             onEntry { raise(AskMainQuestion) }
             onEvent<AskMainQuestion> { furhat.ask("Are you sure?") }
+
+            onReentry { furhat.listen() }
 
             onResponse<Yes> {
                 furhat.say("That's a shame!")
@@ -54,9 +55,12 @@ fun NewUser(name: String) = state(Global) {
     }
 }
 
-//TODO:
-fun GatherInfo(name: String) = state {
+fun GatherInfo(name: String) = state(Global) {
     onEntry {
-        furhat.say("This is not yet implemented")
+        raise(AskHeight())
+        raise(AskWeight())
+        raise(AskAge())
+        raise(AskSex())
+        raise(AskDiet())
     }
 }

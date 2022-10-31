@@ -4,9 +4,11 @@ package furhatos.app.groceriesassistant.memory.entity
  *  Grocery item, corresponding to a food database entry,
  *  name is assumed to be unique
  */
-data class Grocery(val name: String,
-                   val type: String,
-                   val info: Nutrition) {
+data class Grocery(
+    val id: Int,
+    val name: String,
+    val category: String,
+    val info: Nutrition) {
 
     override fun hashCode(): Int {
         return name.hashCode()

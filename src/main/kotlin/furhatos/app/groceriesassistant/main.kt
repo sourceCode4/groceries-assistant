@@ -29,5 +29,4 @@ fun main(args: Array<String>) {
 //    inserter()
 
     Skill.main(args)
-
 }
