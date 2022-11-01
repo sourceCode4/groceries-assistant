@@ -1,5 +1,6 @@
 package furhatos.app.groceriesassistant.nlu
 
+import furhatos.app.groceriesassistant.memory.Memory
 import furhatos.nlu.ComplexEnumEntity
 import furhatos.nlu.EnumEntity
 import furhatos.nlu.ListEntity
@@ -17,9 +18,7 @@ class GroceriesSynonym : EnumEntity() {
  */
 class GroceryCategory : EnumEntity(stemming = true) {
     override fun getEnum(lang: Language): List<String> {
-        return listOf("banana", "apple", "tomato", "chocolate", "ice cream", "fish",
-            "salmon", "tuna", "steak", "burger", "veggie_burger:veggie burger, vegetarian burger",
-            "mayonnaise:mayonnaise,mayo")
+        return Memory.getKinds()
     }
 }
 

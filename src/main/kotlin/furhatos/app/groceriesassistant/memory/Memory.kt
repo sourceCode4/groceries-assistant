@@ -6,22 +6,20 @@ import furhatos.app.groceriesassistant.memory.entity.EmptyNutrition
 import furhatos.app.groceriesassistant.memory.entity.Nutrition
 import furhatos.app.groceriesassistant.memory.entity.User
 import furhatos.app.groceriesassistant.nlu.FieldEnum
+import furhatos.app.groceriesassistant.nlu.Groceries
 import furhatos.app.groceriesassistant.nlu.GroceryKind
 import furhatos.app.groceriesassistant.nlu.UserFieldValue
 
 object Memory {
 
-    private val state = object {
-        lateinit var user: User
-        val userName get() = user.name
-
-        val shoppingList: MutableMap<Grocery, Int> = mutableMapOf()
-    }
-
+    private lateinit var user: User
+    private val shoppingList: HashMap<Grocery, Int> = HashMap()
+    private val userName get() = user.name
     fun initUser(name: String) {
-        state.user = User(name = name)
-        state.user.nutrition = EmptyNutrition
+        user = User(name = name)
+        user.nutrition = EmptyNutrition
     }
+
 
     /**
      *  If a user under @name exists sets it to current and returns true,
@@ -30,13 +28,13 @@ object Memory {
     fun setUser(name: String): Boolean {
         val user = Queries.getUser(name)
         return if (user != null) {
-            state.user = user
+            this.user = user
             true
         } else
             false
     }
     fun updateUser(field: FieldEnum?, value: UserFieldValue): Boolean {
-        with (state.user) {
+        with (user) {
             when (field) {
                 //"name" -> name = value.name?.text ?: return false
                 FieldEnum.HEIGHT -> height = value.number?.value ?: return false
@@ -51,7 +49,7 @@ object Memory {
     }
 
     fun commitUser() {
-        val user = state.user
+        val user = user
         Queries.updateUser(user)
     }
 
@@ -60,15 +58,16 @@ object Memory {
      */
     fun setNewUser(user: User) {
         Queries.addNewUser(user)
-        state.user = user
+        this.user = user
     }
 
     /**
      * Loads user's current list from the database.
      */
     fun overloadCurrent() {
-        //val name = state.user.name
+        //val name = user.name
         //TODO: return current shopping list (in hash map of grocery objects to ints)
+        Queries.currentList(userName)
     }
 
     /**
@@ -76,9 +75,16 @@ object Memory {
      *  otherwise returns false
      */
     fun commit(): Boolean {
-        if (state.shoppingList.isEmpty()) return false
+        if (shoppingList.isEmpty()) return false
         //TODO: put a shopping list into the database
         return true
+    }
+
+    fun getKinds(): List<String> {
+        //TODO: temp for testing, call the database
+        return listOf("banana", "apple", "tomato", "chocolate", "ice cream", "fish",
+            "salmon", "tuna", "steak", "burger", "veggie_burger:veggie burger, vegetarian burger",
+            "mayonnaise:mayonnaise,mayo")
     }
 
     /**
@@ -90,31 +96,35 @@ object Memory {
         //TODO: search the database
         return listOf(
             Grocery(0, "generic banana", "banana", EmptyNutrition),
-            Grocery(1,  "generic $grocery", this.category?.text!!, EmptyNutrition))
+            Grocery(1,  "generic $grocery", "generic", EmptyNutrition))
     }
 
     fun getPreferenceVector() {
-        Queries.getPreferenceVector(state.userName)
+        Queries.getPreferenceVector(userName)
     }
 
     fun setPreferenceVector() {
         //TODO: return array of preferences
     }
 
-    fun currentList(): MutableMap<Grocery, Int> = state.shoppingList
+    fun currentList(): MutableMap<Grocery, Int> = shoppingList
 
     fun addItem(item: Grocery, amount: Int = 1) {
-        state.shoppingList[item] = (state.shoppingList[item] ?: 0) + amount
+        shoppingList[item] = (shoppingList[item] ?: 0) + amount
     }
 
     fun newList() {
-        state.shoppingList.clear()
+        shoppingList.clear()
     }
 
     /**
      *  Returns true if there was an entry with this item in the list
      */
     fun removeItem(item: Grocery): Boolean {
-        return state.shoppingList.remove(item) != null
+        return shoppingList.remove(item) != null
+    }
+
+    fun recommend(): List<Grocery> {
+        return listOf("snickers", "twix", "bueno").map{ Grocery(1, it, "chocolate", EmptyNutrition) }
     }
 }

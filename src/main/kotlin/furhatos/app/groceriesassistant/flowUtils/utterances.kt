@@ -1,4 +1,4 @@
-package furhatos.app.groceriesassistant.utils
+package furhatos.app.groceriesassistant.flowUtils
 
 import furhatos.flow.kotlin.utterance
 
@@ -27,6 +27,12 @@ val done = utterance {
         +"anything else"
         +"that's it"
         +"is that all"
+    }
+}
+
+val recommend = utterance {
+    random {
+        +"would you like some of these items?"
     }
 }
 

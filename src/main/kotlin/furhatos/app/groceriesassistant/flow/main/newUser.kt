@@ -4,7 +4,7 @@ import furhatos.app.groceriesassistant.flow.Global
 import furhatos.app.groceriesassistant.events.control.*
 import furhatos.app.groceriesassistant.flow.UserInfo
 import furhatos.app.groceriesassistant.memory.Memory
-import furhatos.app.groceriesassistant.utils.sayAndAskMain
+import furhatos.app.groceriesassistant.flowUtils.sayAndAskMain
 import furhatos.flow.kotlin.furhat
 import furhatos.flow.kotlin.onNoResponse
 import furhatos.flow.kotlin.onResponse
@@ -74,6 +74,6 @@ fun GatherInfo(name: String) = state(Global) {
 
     onEvent<GotDiet> {
         furhat.say("perfect, i am ready to compose your first list!")
-        goto(SelectInteraction)
+        goto(WithUserPrelude)
     }
 }
