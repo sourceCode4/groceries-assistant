@@ -38,9 +38,10 @@ val UpdateUser = state(WithUser) {
                     "sex"    -> raise(AskSex())
                     "diet"   -> raise(AskDiet())
                 }
-                reentry()
             }
         }
         propagate()
     }
+
+    onEvent<GotInfo> { reentry() }
 }
