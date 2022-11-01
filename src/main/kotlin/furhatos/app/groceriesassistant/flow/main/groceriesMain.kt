@@ -1,15 +1,16 @@
 package furhatos.app.groceriesassistant.flow.main
 
-import furhatos.app.groceriesassistant.events.control.AppendGUI
 import furhatos.app.groceriesassistant.flow.Groceries
 import furhatos.app.groceriesassistant.events.control.AskMainQuestion
 import furhatos.app.groceriesassistant.events.control.DubiousResponse
+import furhatos.app.groceriesassistant.flow.gui
 import furhatos.app.groceriesassistant.flowUtils.alright
 import furhatos.app.groceriesassistant.memory.Memory
 import furhatos.app.groceriesassistant.memory.Memory.getGroceryItems
 import furhatos.app.groceriesassistant.nlu.*
 import furhatos.app.groceriesassistant.flowUtils.askMainQuestion
 import furhatos.app.groceriesassistant.flowUtils.howMany
+import furhatos.app.groceriesassistant.memory.entity.Grocery
 import furhatos.flow.kotlin.*
 import furhatos.nlu.common.Yes
 import furhatos.nlu.common.No
@@ -25,6 +26,7 @@ val NewList = state(Groceries) {
 val EditingList: State = state(Groceries) {
     var addedFirst = false
     var justGotYes = false
+    var justSuggested = false
 
     onEntry { raise(AskMainQuestion) }
     onEvent<AskMainQuestion> {
@@ -33,12 +35,18 @@ val EditingList: State = state(Groceries) {
 
     onReentry {
         justGotYes = false
-        if (addedFirst) random( {
-                goto(Recommend)
-            }, {
-                furhat.ask(random("Anything else?", "Anything else you want to add?"))
+        if (addedFirst) {
+            if (!justSuggested && random(true, false)) {
+                justSuggested = true
+                call(Recommend)
+                reentry()
+            } else {
+                furhat.ask(random(
+                    "Anything else?",
+                    "Anything else you want to add?"))
+                justSuggested = false
             }
-        ) else
+        } else
             furhat.ask(random(
                 "Do you want to add anything?",
                 "Anything you want to add?"), endSil = 1500, maxSpeech = 30000)
@@ -62,7 +70,9 @@ val EditingList: State = state(Groceries) {
         if (groceries == null) propagate()
         else {
             for (grocery in groceries.list) {
-                val addedNew = call(ChooseItem(grocery)) as Boolean?
+                furhat.say("here are some options for ${grocery.text}")
+                val options = grocery.grocery?.getGroceryItems()?.take(10) ?: continue
+                val addedNew = call(ChooseItem(grocery, options)) as Boolean?
                 addedFirst = addedFirst || (addedNew ?: false)
             }
             reentry()
@@ -70,40 +80,48 @@ val EditingList: State = state(Groceries) {
     }
 }
 
-fun ChooseItem(input: QuantifiedGrocery) = state(Groceries) {
-    val options = input.grocery?.getGroceryItems()?.take(10)
+// Check that input.grocery != null before calling!!
+fun ChooseItem(input: QuantifiedGrocery, options: List<Grocery>) = state(Groceries) {
+    input.grocery!!
 
     onEntry {
-        furhat.say("here are some options for ${input.grocery?.text}.")
-        options?.forEach {
-            raise(AppendGUI(it.name))
+        gui.clear()
+        options.forEach {
+            gui.append(it.name)
         }
         raise(AskMainQuestion)
     }
 
-    options?.forEach { option ->
+    options.forEach { option ->
         onResponse(option.name) {
             var count = input.count?.value
             if (count == null || input.isUnspecifiedPlural) {
-                count = call(HowMany(input.grocery)) as Int? ?: 0
+                count = call(HowMany(input.grocery.category?.text)) as Int? ?: 0
             }
-            when (count) {
-                0, 1 -> furhat.say(option.name)
-                else -> furhat.say("$count ${input.grocery.text}")
+            when {
+                count < 0 -> raise(DubiousResponse())
+                count > 1 -> furhat.say("$count ${input.grocery.text}")
+                else -> furhat.say(option.name)
             }
             Memory.addItem(option, count)
             terminate(true)
         }
     }
 
-    onReentry { raise(AskMainQuestion) }
-
     onEvent<AskMainQuestion> {
-        furhat.ask("which product would you like?", timeout = 8000)
+        furhat.ask(random("which product would you like?",
+                                "which would you like?"), timeout = 8000)
     }
+
+    onResponse("none", "neither", "nothing") {
+        furhat.say(alright)
+        terminate(false)
+    }
+
+    onExit { gui.clear() }
 }
 
-fun HowMany(item: GroceryKind) = state(Groceries) {
+fun HowMany(category: String?) = state(Groceries) {
     askMainQuestion(howMany())
 
     onResponse<Number> {
@@ -114,14 +132,13 @@ fun HowMany(item: GroceryKind) = state(Groceries) {
             else -> terminate(number)
         }
     }
-    //onResponse(DynamicIntent(list)) {  }
-    // change to quantified grocery?
+
     onResponse<AddGroceries> {
         val received = it.intent.groceries?.list
         if (received == null) propagate()
         else {
             if (received.size == 1 &&
-                received.first().grocery?.category == item.category &&
+                received.first().grocery?.category?.text == category &&
                 received.first().count != null)
                 raise(received.first().count!!)
             else

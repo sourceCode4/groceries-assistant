@@ -9,8 +9,7 @@ import furhatos.flow.kotlin.*
 
 val SelectInteraction = state(WithUser) {
     init {
-        //TODO: commented out for testing
-        //Memory.overloadCurrent()
+        Memory.overloadCurrent()
     }
 
     askMainQuestion(utterance {

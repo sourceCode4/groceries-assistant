@@ -25,7 +25,6 @@ val alright = utterance {
 val done = utterance {
     random {
         +"anything else"
-        +"that's it"
         +"is that all"
     }
 }
