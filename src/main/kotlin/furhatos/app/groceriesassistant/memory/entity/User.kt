@@ -14,7 +14,8 @@ data class User(
     lateinit var nutrition: Nutrition
 
     constructor(
-        name: String, height: Int, weight: Int, age: Int, sex: Sex, nutrition: Nutrition
+        name: String, height: Int = 165, weight: Int = 60, age: Int = 23,
+        sex: Sex = Sex.MALE, nutrition: Nutrition = EmptyNutrition
     ) : this(name, height, weight, age) {
         this.sex = sex
         this.nutrition = nutrition
