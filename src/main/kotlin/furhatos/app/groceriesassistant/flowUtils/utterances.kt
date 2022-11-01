@@ -30,9 +30,9 @@ val done = utterance {
     }
 }
 
-fun recommend(item: String) = utterance {
+val recommend = utterance {
     random {
-        +"would you also enjoy some of these items?"
+        +"would you like some of these items?"
     }
 }
 

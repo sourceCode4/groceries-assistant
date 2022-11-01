@@ -99,7 +99,7 @@ fun ChooseItem(input: QuantifiedGrocery) = state(Groceries) {
     onReentry { raise(AskMainQuestion) }
 
     onEvent<AskMainQuestion> {
-        furhat.ask("which product would you like?")
+        furhat.ask("which product would you like?", timeout = 8000)
     }
 }
 

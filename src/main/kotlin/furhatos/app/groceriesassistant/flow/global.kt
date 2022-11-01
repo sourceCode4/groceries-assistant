@@ -21,15 +21,11 @@ val Global = state {
 
     onResponse<RequestRepeat> { raise(AskMainQuestion) }
 
+    onResponse<Done> { raise(Exit()) }
+
     onResponse<Exit> {
         furhat.say("Till next time!")
         goto(Idle)
-    }
-
-    onResponse {
-        val getIt = random("understand that", "get that", "catch that")
-        furhat.say("Sorry, I didn't $getIt")
-        reentry()
     }
 
     onNoResponse {
@@ -43,5 +39,11 @@ val Global = state {
             null -> furhat.say("I guess that's a no")
         }
         raise(Exit())
+    }
+
+    onResponse {
+        val getIt = random("understand that", "get that", "catch that")
+        furhat.say("Sorry, I didn't $getIt")
+        reentry()
     }
 }

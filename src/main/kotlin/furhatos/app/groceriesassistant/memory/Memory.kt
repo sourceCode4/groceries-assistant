@@ -80,6 +80,13 @@ object Memory {
         return true
     }
 
+    fun getKinds(): List<String> {
+        //TODO: temp for testing, call the database
+        return listOf("banana", "apple", "tomato", "chocolate", "ice cream", "fish",
+            "salmon", "tuna", "steak", "burger", "veggie_burger:veggie burger, vegetarian burger",
+            "mayonnaise:mayonnaise,mayo")
+    }
+
     /**
      *  Retrieves grocery items from the database that match the grocery entity
      *  asked for by the user
@@ -89,7 +96,7 @@ object Memory {
         //TODO: search the database
         return listOf(
             Grocery(0, "generic banana", "banana", EmptyNutrition),
-            Grocery(1,  "generic $grocery", this.category?.text!!, EmptyNutrition))
+            Grocery(1,  "generic $grocery", "generic", EmptyNutrition))
     }
 
     fun getPreferenceVector() {
@@ -117,7 +124,7 @@ object Memory {
         return shoppingList.remove(item) != null
     }
 
-    fun recommend(): List<Groceries> {
-        return listOf()
+    fun recommend(): List<Grocery> {
+        return listOf("snickers", "twix", "bueno").map{ Grocery(1, it, "chocolate", EmptyNutrition) }
     }
 }
