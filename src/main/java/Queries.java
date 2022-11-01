@@ -279,9 +279,21 @@ public class Queries {
         }
     }
 
-    public static List<Grocery> searchGroceries(String userName, String input) {
-        //TODO: return the list of groceries that match the input,
-        // ordered by this user's preference
+    public static List<Grocery> searchGroceries(String item) {
+        String query =  "SELECT * FROM FOOD WHERE Subgroup LIKE "+item;
+        try(Connection conn = DriverManager.getConnection(URL, USER, PWD);
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+        ){
+            ArrayList<Float> list = new ArrayList<>();
+            while(rs.next()){
+                //Display values
+                System.out.print("Name: " + rs.getString("Name"));
+                list.add(Float.valueOf(rs.getString("Name")));
+            }
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
         return null;
     }
 
@@ -289,8 +301,7 @@ public class Queries {
         //TODO: return this user's preference array,
         // with each index matching the primary key of the food
         String query =  "SELECT pref FROM shopping " +
-                        "WHERE userid = (SELECT id FROM users WHERE name LIKE " + userName + ") " +
-                        "ORDER BY foodid";
+                        "WHERE userid = " + userName;
         ArrayList<Float> list = new ArrayList<>();
         try(Connection conn = DriverManager.getConnection(URL, USER, PWD);
             Statement stmt = conn.createStatement();
@@ -307,7 +318,7 @@ public class Queries {
         return list;
     }
 
-    public static void setPreferenceVector(String userName, float[] prefs) {
+    public static void setPreferenceVector() {
         try {
             Process p = Runtime.getRuntime().exec("recommendations.py");
         } catch (IOException e) {

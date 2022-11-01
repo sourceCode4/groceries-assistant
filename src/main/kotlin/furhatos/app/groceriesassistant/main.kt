@@ -8,6 +8,7 @@ import DatabaseBuilder
 import DatabaseBuilder.ana
 import DatabaseBuilder.build
 import Queries.getItemsForRecommendation
+import Queries.setPreferenceVector
 import furhatos.app.groceriesassistant.flow.Init
 import furhatos.flow.kotlin.*
 import furhatos.skills.Skill
@@ -37,5 +38,6 @@ fun main(args: Array<String>) {
 //
 //    getPreferenceVector(username)
     //getItemsForRecommendation();
-    ana();
+//    ana();
+    setPreferenceVector()
 }

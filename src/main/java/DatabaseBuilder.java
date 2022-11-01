@@ -33,7 +33,7 @@ public class DatabaseBuilder {
             e.printStackTrace();
         }
         String query = "";
-        query = "CREATE TABLE shopping7 " +
+        query = "CREATE TABLE shopping8 " +
                 "(userid     INT NOT NULL," +
                 "foodid      INT NOT NULL," +
                 " COUNT            INT, " +
