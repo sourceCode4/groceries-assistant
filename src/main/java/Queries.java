@@ -1,5 +1,6 @@
 import furhatos.app.groceriesassistant.memory.entity.*;
 
+import java.io.IOException;
 import java.sql.*;
 import java.util.*;
 import java.sql.Connection;
@@ -308,23 +309,28 @@ public class Queries {
 
     public static void setPreferenceVector(String userName, float[] prefs) {
         try {
-            Connection connection = DriverManager.getConnection(URL, USER, PWD);
-            Statement stmt = connection.createStatement();
-
-            for(int i=0; i<prefs.length; i++) {
-
-                String sql =
-                        "UPDATE shopping" +
-                        "SET pref = '" + prefs[i] + "' " +
-                        "WHERE userid = (SELECT id FROM users WHERE name = '" + userName + "') " +
-                            "AND FoodID = " + i;
-
-                stmt.executeUpdate(sql);
-            }
-
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+            Process p = Runtime.getRuntime().exec("recommendations.py");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+//        try {
+//            Connection connection = DriverManager.getConnection(URL, USER, PWD);
+//            Statement stmt = connection.createStatement();
+//
+//            for(int i=0; i<prefs.length; i++) {
+//
+//                String sql =
+//                        "UPDATE shopping" +
+//                        "SET pref = '" + prefs[i] + "' " +
+//                        "WHERE userid = (SELECT id FROM users WHERE name = '" + userName + "') " +
+//                            "AND FoodID = " + i;
+//
+//                stmt.executeUpdate(sql);
+//            }
+//
+//        } catch (SQLException ex) {
+//            ex.printStackTrace();
+//        }
     }
 
 
