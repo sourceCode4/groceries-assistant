@@ -1,5 +1,4 @@
 import furhatos.app.groceriesassistant.memory.entity.*;
-
 import java.sql.*;
 import java.util.*;
 import java.sql.Connection;
@@ -30,11 +29,11 @@ public class Queries {
             stmt = c.createStatement();
 
             String sql =
-                    "SELECT *  FROM user WHERE user.name = '" + name +"'";
+                    "SELECT *  FROM users WHERE users.name = '" + name +"'";
 
             ResultSet rs = stmt.executeQuery(sql);
 
-            if (rs.next() == false){
+            if (!rs.isBeforeFirst()) {
                 return null;
             }
             rs.next();
@@ -90,7 +89,7 @@ public class Queries {
             stmt = c.createStatement();
 
             String sql =
-                    "UPDATE user SET (age, weight, height, sex,diet) = ('" + age + "', '" + weight + "','" + height + "','" + sex + "','" + diet + "')" +
+                    "UPDATE users SET (age, weight, height, sex,diet) = ('" + age + "', '" + weight + "','" + height + "','" + sex + "','" + diet + "')" +
                      "WHERE name = '" + name + "'";
 
 
@@ -123,7 +122,7 @@ public class Queries {
 
         String sql =
                 "INSERT INTO shopping(userid, foodid, COUNT, PREF)" +
-                        "SELECT (SELECT id FROM user WHERE user.name = '" + x + "'), id, 0 as COUNT, 1 as PREF FROM FOOD";
+                        "SELECT (SELECT id FROM users WHERE users.name = '" + x + "'), id, 0 as COUNT, 1 as PREF FROM FOOD";
 
         stmt.executeUpdate(sql);
         stmt.close();
@@ -163,7 +162,7 @@ public class Queries {
 //            VALUES (5,5,5,5,'FEMALE',5,5,5,5,'VEGAN');
 
             String sql =
-                    "INSERT INTO user(name, age, weight, height, sex, calories, protein, carbs, fats, diet)" +
+                    "INSERT INTO users(name, age, weight, height, sex, calories, protein, carbs, fats, diet)" +
                             "VALUES ('" + name + "','" + age + "','" + weight + "','" + height + "','" + sex + "','" + calories +"','" + protein + "','" + carbs + "','" + fats + "','" + diet + "')";
 
             stmt.executeUpdate(sql);
@@ -193,7 +192,7 @@ public class Queries {
             String sql =
                     "SELECT food.id, name, subgroup, calories, protein, carbs, fat, diet, count FROM shopping" +
                             "            JOIN food ON shopping.foodid = food.id" +
-                            "            WHERE shopping.userid = (select id from user where name = " + userName + ") AND count > 0";
+                            "            WHERE shopping.userid = (select id from users where name = '" + userName + "') AND count > 0";
 
 //            ResultSet rs = stmt.executeQuery(sql);
 //            rs.next();
@@ -262,7 +261,7 @@ public class Queries {
 
                 String sql =
                         "UPDATE shopping SET count = '"+count+"'" +
-                                "WHERE userid IN (SELECT id FROM user WHERE user.name = '" + userName + "') AND shopping.foodid = '" + foodId + "' ";
+                                "WHERE userid IN (SELECT id FROM users WHERE users.name = '" + userName + "') AND shopping.foodid = '" + foodId + "' ";
 
                 stmt.executeUpdate(sql);
                 stmt.close();
