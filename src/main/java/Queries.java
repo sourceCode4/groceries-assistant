@@ -11,8 +11,10 @@ import java.util.List;
 import java.util.Objects;
 
 public class Queries {
-    static String USER = "postgres";
-    static String PWD  = "admin";
+
+    static final String URL = "jdbc:postgresql://localhost:5432/groceriesassistant";
+    static final String USER = "postgres";
+    static final String PWD  = "admin";
     public static User getUser(String name) {
         //TODO: if the user with this name exists, return that,
         //  otherwise return null
@@ -21,8 +23,7 @@ public class Queries {
         try {
             Class.forName("org.postgresql.Driver");
             c = DriverManager
-                    .getConnection("jdbc:postgresql://localhost:5432/groceriesassistant",
-                            USER, PWD); //Please use your own postgreSQL password
+                    .getConnection(URL, USER, PWD); //Please use your own postgreSQL password
             System.out.println("connected");
 
 
@@ -82,8 +83,7 @@ public class Queries {
         try {
             Class.forName("org.postgresql.Driver");
             c = DriverManager
-                    .getConnection("jdbc:postgresql://localhost:5432/groceriesassistant",
-                            USER, PWD); //Please use your own postgreSQL password
+                    .getConnection(URL, USER, PWD); //Please use your own postgreSQL password
             System.out.println("connected");
 
 
@@ -114,8 +114,7 @@ public class Queries {
 
         Class.forName("org.postgresql.Driver");
         c = DriverManager
-                .getConnection("jdbc:postgresql://localhost:5432/groceriesassistant",
-                        USER, PWD); //Please use your own postgreSQL password
+                .getConnection(URL, USER, PWD); //Please use your own postgreSQL password
         System.out.println("connected");
 
 
@@ -154,8 +153,7 @@ public class Queries {
         try {
             Class.forName("org.postgresql.Driver");
             c = DriverManager
-                    .getConnection("jdbc:postgresql://localhost:5432/groceriesassistant",
-                            USER, PWD); //Please use your own postgreSQL password
+                    .getConnection(URL, USER, PWD); //Please use your own postgreSQL password
             System.out.println("connected");
 
 
@@ -186,8 +184,7 @@ public class Queries {
         try {
             Class.forName("org.postgresql.Driver");
             c = DriverManager
-                    .getConnection("jdbc:postgresql://localhost:5432/groceriesassistant",
-                            USER, PWD); //Please use your own postgreSQL password
+                    .getConnection(URL, USER, PWD); //Please use your own postgreSQL password
             System.out.println("connected");
 
 
@@ -251,8 +248,7 @@ public class Queries {
         try {
             Class.forName("org.postgresql.Driver");
             c = DriverManager
-                    .getConnection("jdbc:postgresql://localhost:5432/groceriesassistant",
-                            USER, PWD); //Please use your own postgreSQL password
+                    .getConnection(URL, USER, PWD); //Please use your own postgreSQL password
             System.out.println("connected");
 
 
@@ -312,11 +308,8 @@ public class Queries {
     }
 
     public static void setPreferenceVector(String userName, float[] prefs) {
-        String DB_URL = "";
-        String USER = "";
-        String PASS = "";
         try {
-            Connection connection = DriverManager.getConnection(DB_URL, USER, PASS);
+            Connection connection = DriverManager.getConnection(URL, USER, PWD);
             //Name, Subgroup, Group, Diet, Calories, Protein, Carbs, Fat
             Statement stmt = connection.createStatement();
             int count = 0;
@@ -326,7 +319,8 @@ public class Queries {
                 String sql =
                         "UPDATE shopping" +
                         "SET pref = '" + prefs[i] + "' " +
-                        "WHERE userid = (SELECT id FROM users WHERE name = '" + userName + "') AND FoodID = '" + i+"'";
+                        "WHERE userid = (SELECT id FROM users WHERE name = '" + userName + "') " +
+                            "AND FoodID = " + i;
 
                 stmt.executeUpdate(sql);
             }
