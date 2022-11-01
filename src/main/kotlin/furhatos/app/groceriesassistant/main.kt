@@ -4,6 +4,7 @@ package furhatos.app.groceriesassistant
 
 
 
+import DatabaseBuilder
 import furhatos.app.groceriesassistant.flow.Init
 import furhatos.flow.kotlin.*
 import furhatos.skills.Skill
@@ -16,7 +17,6 @@ class GroceriesassistantSkill : Skill() {
 }
 
 fun main(args: Array<String>) {
-
 //    val a: String = "c"
 //    getUser(a);
 
@@ -33,6 +33,5 @@ fun main(args: Array<String>) {
 //
 //
 //    getPreferenceVector(username)
-
-    Skill.main(args)
+    DatabaseBuilder.build()
 }

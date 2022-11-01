@@ -42,9 +42,9 @@ repositories {
     maven { url 'https://repo.gradle.org/gradle/libs-releases' }
 }
 
-
 dependencies {
     compile 'com.furhatrobotics.furhatos:furhat-commons:2.4.0'
+    compile 'org.postgresql:postgresql:42.2.18'
 }
 
 jar {

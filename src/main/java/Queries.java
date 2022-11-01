@@ -19,7 +19,7 @@ public class Queries {
         try {
             Class.forName("org.postgresql.Driver");
             c = DriverManager
-                    .getConnection("jdbc:postgresql://localhost:5432/test",
+                    .getConnection("jdbc:postgresql://localhost:5432/groceriesassistant",
                             "postgres", "TO BE ADDED"); //Please use your own postgreSQL password
             System.out.println("connected");
 
@@ -80,7 +80,7 @@ public class Queries {
         try {
             Class.forName("org.postgresql.Driver");
             c = DriverManager
-                    .getConnection("jdbc:postgresql://localhost:5432/test",
+                    .getConnection("jdbc:postgresql://localhost:5432/groceriesassistant",
                             "postgres", "TO BE ADDED"); //Please use your own postgreSQL password
             System.out.println("connected");
 
@@ -112,7 +112,7 @@ public class Queries {
 
         Class.forName("org.postgresql.Driver");
         c = DriverManager
-                .getConnection("jdbc:postgresql://localhost:5432/test",
+                .getConnection("jdbc:postgresql://localhost:5432/groceriesassistant",
                         "postgres", "TO BE ADDED"); //Please use your own postgreSQL password
         System.out.println("connected");
 
@@ -152,7 +152,7 @@ public class Queries {
         try {
             Class.forName("org.postgresql.Driver");
             c = DriverManager
-                    .getConnection("jdbc:postgresql://localhost:5432/test",
+                    .getConnection("jdbc:postgresql://localhost:5432/groceriesassistant",
                             "postgres", "TO BE ADDED"); //Please use your own postgreSQL password
             System.out.println("connected");
 
@@ -184,7 +184,7 @@ public class Queries {
         try {
             Class.forName("org.postgresql.Driver");
             c = DriverManager
-                    .getConnection("jdbc:postgresql://localhost:5432/test",
+                    .getConnection("jdbc:postgresql://localhost:5432/groceriesassistant",
                             "postgres", "TO BE ADDED"); //Please use your own postgreSQL password
             System.out.println("connected");
 
@@ -249,11 +249,9 @@ public class Queries {
         try {
             Class.forName("org.postgresql.Driver");
             c = DriverManager
-                    .getConnection("jdbc:postgresql://localhost:5432/test",
+                    .getConnection("jdbc:postgresql://localhost:5432/groceriesassistant",
                             "postgres", "TO BE ADDED"); //Please use your own postgreSQL password
             System.out.println("connected");
-
-
 
 
             Iterator<HashMap.Entry<Grocery, Integer>> iterator = newList.entrySet().iterator();
@@ -296,7 +294,9 @@ public class Queries {
         String DB_URL = "";
         String USER = "";
         String PASS = "";
-        String query = "SELECT Preference FROM (TABLE NAME) WHERE Username LIKE " + userName +" ORDER BY Foodname";
+        String query =  "SELECT pref FROM shopping " +
+                        "WHERE userid = (SELECT id FROM users WHERE name LIKE " + userName + ") " +
+                        "ORDER BY foodid";
         ArrayList<Float> list = new ArrayList<>();
         try(Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
             Statement stmt = conn.createStatement();
