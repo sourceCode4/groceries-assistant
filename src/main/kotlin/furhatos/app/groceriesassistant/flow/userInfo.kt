@@ -1,13 +1,12 @@
 package furhatos.app.groceriesassistant.flow
 
 import furhatos.app.groceriesassistant.events.control.*
+import furhatos.app.groceriesassistant.flowUtils.askMainQuestion
 import furhatos.app.groceriesassistant.memory.Memory
 import furhatos.app.groceriesassistant.nlu.Diet
 import furhatos.app.groceriesassistant.nlu.FieldEnum
 import furhatos.app.groceriesassistant.nlu.Sex
 import furhatos.app.groceriesassistant.nlu.UserFieldValue
-import furhatos.app.groceriesassistant.utils.askMainQuestion
-import furhatos.flow.kotlin.furhat
 import furhatos.flow.kotlin.onResponse
 import furhatos.flow.kotlin.partialState
 import furhatos.flow.kotlin.state
