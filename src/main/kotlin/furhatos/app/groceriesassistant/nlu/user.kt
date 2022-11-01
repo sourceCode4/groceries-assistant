@@ -6,7 +6,7 @@ import furhatos.nlu.common.Number
 import furhatos.nlu.common.PersonName as Name
 import furhatos.util.Language
 
-class PersonName : EnumEntity(speechRecPhrases = true) {
+class Name : EnumEntity() {
     override fun getEnum(lang: Language): List<String> {
         val name = Name()
         return name.getEnum(Language.ENGLISH_US) +
@@ -49,9 +49,17 @@ class UserField : EnumEntity(stemming = true) {
 
 class Sex : EnumEntity() {
     override fun getEnum(lang: Language): List<String> {
-        return listOf("male", "female")
+        return listOf("male:man,boy,male,mail", "female:woman,girl,female")
     }
-    val enum get() = when (text) {
+    override fun toText(): String {
+        return when (super.text) {
+            "man","boy","male","mail" -> "male"
+            "woman","girl","female"   -> "female"
+            else -> text
+        }
+    }
+
+    val enum get() = when (toText()) {
         "male" -> furhatos.app.groceriesassistant.memory.entity.Sex.MALE
         "female" -> furhatos.app.groceriesassistant.memory.entity.Sex.FEMALE
         else -> null

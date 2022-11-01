@@ -9,7 +9,6 @@ class BuySynonym : EnumEntity() {
     }
 }
 
-
 class MakeSynonym : EnumEntity() {
     override fun getEnum(lang: Language): List<String> {
         return listOf("make,create,assemble,put together")

@@ -5,10 +5,10 @@ package furhatos.app.groceriesassistant.memory.entity
  *  name is assumed to be unique
  */
 data class Grocery(
-    val id: Int,
-    val name: String,
-    val category: String,
-    val info: Nutrition) {
+        val id: Int,
+        val name: String,
+        val subgroup: String,
+        val info: Nutrition) {
 
     override fun hashCode(): Int {
         return name.hashCode()

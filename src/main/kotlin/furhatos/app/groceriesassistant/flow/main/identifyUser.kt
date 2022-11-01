@@ -2,10 +2,10 @@ package furhatos.app.groceriesassistant.flow.main
 
 import furhatos.app.groceriesassistant.flow.Global
 import furhatos.app.groceriesassistant.memory.Memory
-import furhatos.app.groceriesassistant.nlu.PersonName
 import furhatos.app.groceriesassistant.utils.greeting
 import furhatos.app.groceriesassistant.utils.sayAndAskMain
 import furhatos.flow.kotlin.*
+import furhatos.nlu.common.PersonName
 
 val IdentifyUser = state(Global) {
     var noResponse = 0

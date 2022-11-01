@@ -4,6 +4,7 @@ import furhatos.app.groceriesassistant.events.control.AppendGUI
 import furhatos.app.groceriesassistant.events.control.ClearGUI
 import furhatos.app.groceriesassistant.events.control.DubiousResponse
 import furhatos.app.groceriesassistant.flow.main.SelectInteraction
+import furhatos.app.groceriesassistant.nlu.Done
 import furhatos.app.groceriesassistant.utils.alright
 import furhatos.app.groceriesassistant.nlu.Exit
 import furhatos.flow.kotlin.*
@@ -24,7 +25,7 @@ val WithUser: State = state(Global) {
 
     onReentry { furhat.listen() }
 
-    onResponse<Exit> {
+    onResponse<Done> {
         furhat.say(alright)
         gui.clear()
         goto(SelectInteraction)
