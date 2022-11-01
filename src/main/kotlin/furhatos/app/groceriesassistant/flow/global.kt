@@ -20,6 +20,7 @@ val Global = state {
     }
 
     onResponse<RequestRepeat> { raise(AskMainQuestion) }
+    onReentry { raise(AskMainQuestion) }
 
     onResponse<Exit> {
         furhat.say("Till next time!")
