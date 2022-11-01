@@ -67,7 +67,7 @@ object Memory {
     fun overloadCurrent() {
         //val name = user.name
         //TODO: return current shopping list (in hash map of grocery objects to ints)
-        Queries.currentList(userName)
+        Queries.currentList(userName, shoppingList)
     }
 
     /**
