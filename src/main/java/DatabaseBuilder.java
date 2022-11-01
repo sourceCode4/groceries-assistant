@@ -4,10 +4,10 @@ import java.sql.*;
 
 public class DatabaseBuilder {
 
-    static String csvFilePath = "C:\\Users\\lukaj\\Code\\Repos\\GroceriesAssistant\\src\\main\\java\\newdata.csv"; //TODO: fill your absolute path to newdata.csv
+    static String csvFilePath = "newdata.csv"; //TODO: fill your absolute path to newdata.csv
     static String DB_URL = "jdbc:postgresql:groceriesassistant";
     static String USER = "postgres";
-    static String PASS = "admin"; //TODO: fill in your password here
+    static String PASS = "ana"; //TODO: fill in your password here
 
     public static void build(){
         try {
@@ -15,7 +15,7 @@ public class DatabaseBuilder {
 
             Connection init = DriverManager.getConnection("jdbc:postgresql://localhost:5432/", USER, PASS);
             Statement initStmt = init.createStatement();
-            String query = "CREATE DATABASE groceriesassistant";
+            String query = "CREATE DATABASE TEST4";
             initStmt.execute(query);
             initStmt.close();
             init.close();
@@ -24,7 +24,7 @@ public class DatabaseBuilder {
             Connection connection = DriverManager.getConnection(DB_URL, USER, PASS);
             Statement stmt = connection.createStatement();
 
-            query = "CREATE TABLE FOOD " +
+            query = "CREATE TABLE FOOD3 " +
                     "(id SERIAL PRIMARY KEY," +
                     " name VARCHAR(255), " +
                     " subgroup VARCHAR(255), " +
@@ -105,6 +105,7 @@ public class DatabaseBuilder {
                             "foodid      INT NOT NULL," +
                             " COUNT            INT, " +
                             " PREF             FLOAT," +
+                            " AMOUNT              INT," +
                             "PRIMARY KEY(userid, foodid))";
             stmt.execute(query);
             System.out.println("created shopping table");

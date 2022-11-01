@@ -14,7 +14,9 @@ public class Queries {
 
     static final String URL = "jdbc:postgresql://localhost:5432/groceriesassistant";
     static final String USER = "postgres";
-    static final String PWD  = "admin";
+    static final String PWD  = "ana";
+
+
     public static User getUser(String name) {
         //TODO: if the user with this name exists, return that,
         //  otherwise return null
@@ -285,14 +287,11 @@ public class Queries {
     public static ArrayList<Float> getPreferenceVector(String userName) {
         //TODO: return this user's preference array,
         // with each index matching the primary key of the food
-        String DB_URL = "";
-        String USER = "";
-        String PASS = "";
         String query =  "SELECT pref FROM shopping " +
                         "WHERE userid = (SELECT id FROM users WHERE name LIKE " + userName + ") " +
                         "ORDER BY foodid";
         ArrayList<Float> list = new ArrayList<>();
-        try(Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+        try(Connection conn = DriverManager.getConnection(URL, USER, PWD);
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(query);
         ) {
@@ -310,9 +309,7 @@ public class Queries {
     public static void setPreferenceVector(String userName, float[] prefs) {
         try {
             Connection connection = DriverManager.getConnection(URL, USER, PWD);
-            //Name, Subgroup, Group, Diet, Calories, Protein, Carbs, Fat
             Statement stmt = connection.createStatement();
-            int count = 0;
 
             for(int i=0; i<prefs.length; i++) {
 
@@ -328,5 +325,31 @@ public class Queries {
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
+    }
+
+
+
+    public static int[][] getItemsForRecommendation(){
+        String query = "SELECT shopping userid, foodid, amount FROM shopping";
+        String query2 = "SELECT COUNT(*) FROM shopping";
+        try(Connection conn = DriverManager.getConnection(URL, USER, PWD);
+            Statement stmt = conn.createStatement();
+            ResultSet count = stmt.executeQuery(query2);
+            ResultSet rs = stmt.executeQuery(query);
+        ) {
+            count.next();
+            int num = count.getInt(1);
+            int[][] result = new int[num][3];
+            for(int i = 0; i<num; i++){
+                rs.next();
+                result[i][0] = rs.getInt(1);
+                result[i][1] = rs.getInt(2);
+                result[i][2] = rs.getInt(3);
+            }
+            return result;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return null;
     }
 }

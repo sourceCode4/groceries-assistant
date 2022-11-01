@@ -5,6 +5,7 @@ package furhatos.app.groceriesassistant
 
 
 import DatabaseBuilder
+import Queries.getItemsForRecommendation
 import furhatos.app.groceriesassistant.flow.Init
 import furhatos.flow.kotlin.*
 import furhatos.skills.Skill
@@ -33,5 +34,5 @@ fun main(args: Array<String>) {
 //
 //
 //    getPreferenceVector(username)
-    DatabaseBuilder.build()
+    getItemsForRecommendation();
 }
