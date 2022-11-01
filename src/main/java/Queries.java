@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Objects;
 
 public class Queries {
+    static String USER = "postgres";
+    static String PWD  = "admin";
     public static User getUser(String name) {
         //TODO: if the user with this name exists, return that,
         //  otherwise return null
@@ -20,7 +22,7 @@ public class Queries {
             Class.forName("org.postgresql.Driver");
             c = DriverManager
                     .getConnection("jdbc:postgresql://localhost:5432/groceriesassistant",
-                            "postgres", "TO BE ADDED"); //Please use your own postgreSQL password
+                            USER, PWD); //Please use your own postgreSQL password
             System.out.println("connected");
 
 
@@ -81,7 +83,7 @@ public class Queries {
             Class.forName("org.postgresql.Driver");
             c = DriverManager
                     .getConnection("jdbc:postgresql://localhost:5432/groceriesassistant",
-                            "postgres", "TO BE ADDED"); //Please use your own postgreSQL password
+                            USER, PWD); //Please use your own postgreSQL password
             System.out.println("connected");
 
 
@@ -113,7 +115,7 @@ public class Queries {
         Class.forName("org.postgresql.Driver");
         c = DriverManager
                 .getConnection("jdbc:postgresql://localhost:5432/groceriesassistant",
-                        "postgres", "TO BE ADDED"); //Please use your own postgreSQL password
+                        USER, PWD); //Please use your own postgreSQL password
         System.out.println("connected");
 
 
@@ -153,7 +155,7 @@ public class Queries {
             Class.forName("org.postgresql.Driver");
             c = DriverManager
                     .getConnection("jdbc:postgresql://localhost:5432/groceriesassistant",
-                            "postgres", "TO BE ADDED"); //Please use your own postgreSQL password
+                            USER, PWD); //Please use your own postgreSQL password
             System.out.println("connected");
 
 
@@ -185,7 +187,7 @@ public class Queries {
             Class.forName("org.postgresql.Driver");
             c = DriverManager
                     .getConnection("jdbc:postgresql://localhost:5432/groceriesassistant",
-                            "postgres", "TO BE ADDED"); //Please use your own postgreSQL password
+                            USER, PWD); //Please use your own postgreSQL password
             System.out.println("connected");
 
 
@@ -250,7 +252,7 @@ public class Queries {
             Class.forName("org.postgresql.Driver");
             c = DriverManager
                     .getConnection("jdbc:postgresql://localhost:5432/groceriesassistant",
-                            "postgres", "TO BE ADDED"); //Please use your own postgreSQL password
+                            USER, PWD); //Please use your own postgreSQL password
             System.out.println("connected");
 
 
@@ -263,12 +265,8 @@ public class Queries {
                 int foodId = grocery.getId();
 
                 String sql =
-
                         "UPDATE shopping SET count = '"+count+"'" +
-
                                 "WHERE userid IN (SELECT id FROM user WHERE user.name = '" + userName + "') AND shopping.foodid = '" + foodId + "' ";
-
-
 
                 stmt.executeUpdate(sql);
                 stmt.close();
@@ -325,9 +323,10 @@ public class Queries {
 
             for(int i=0; i<prefs.length; i++) {
 
-                String sql = "UPDATE (TABLE NAME)" +
-                        "SET Preference = '" + prefs[i] + "' " +
-                        "WHERE Username = '" + userName + "' AND FoodID = '" + i+"'";
+                String sql =
+                        "UPDATE shopping" +
+                        "SET pref = '" + prefs[i] + "' " +
+                        "WHERE userid = (SELECT id FROM users WHERE name = '" + userName + "') AND FoodID = '" + i+"'";
 
                 stmt.executeUpdate(sql);
             }
