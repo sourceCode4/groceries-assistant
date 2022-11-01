@@ -4,13 +4,7 @@ package furhatos.app.groceriesassistant
 
 
 
-import Queries.*
-import TestClassInterop.*
 import furhatos.app.groceriesassistant.flow.Init
-import furhatos.app.groceriesassistant.memory.entity.Diet
-import furhatos.app.groceriesassistant.memory.entity.Nutrition
-import furhatos.app.groceriesassistant.memory.entity.Sex
-import furhatos.app.groceriesassistant.memory.entity.User
 import furhatos.flow.kotlin.*
 import furhatos.skills.Skill
 

@@ -27,7 +27,7 @@ public class Queries {
             stmt = c.createStatement();
 
             String sql =
-                    "SELECT *  FROM USERDATA WHERE userdata.name = '" + name +"'";
+                    "SELECT *  FROM user WHERE user.name = '" + name +"'";
 
             ResultSet rs = stmt.executeQuery(sql);
 
@@ -88,7 +88,7 @@ public class Queries {
             stmt = c.createStatement();
 
             String sql =
-                    "UPDATE userdata SET (age, weight, height, sex,diet) = ('" + age + "', '" + weight + "','" + height + "','" + sex + "','" + diet + "')" +
+                    "UPDATE user SET (age, weight, height, sex,diet) = ('" + age + "', '" + weight + "','" + height + "','" + sex + "','" + diet + "')" +
                      "WHERE name = '" + name + "'";
 
 
@@ -103,6 +103,33 @@ public class Queries {
         }
 
 
+
+    }
+    public static void addShoppingTable(String x) throws ClassNotFoundException, SQLException {
+
+        Connection c = null;
+        Statement stmt = null;
+
+        Class.forName("org.postgresql.Driver");
+        c = DriverManager
+                .getConnection("jdbc:postgresql://localhost:5432/test",
+                        "postgres", "TO BE ADDED"); //Please use your own postgreSQL password
+        System.out.println("connected");
+
+
+        stmt = c.createStatement();
+
+
+        String sql =
+                "INSERT INTO shopping(userid, foodid, COUNT, PREF)" +
+                        "SELECT (SELECT id FROM user WHERE user.name = '" + x + "'), id, 0 as COUNT, 1 as PREF FROM FOOD";
+
+        stmt.executeUpdate(sql);
+        stmt.close();
+        c.close();
+
+        System.out.println("Opened database successfully");
+        System.out.println("Table created successfully");
 
     }
 
@@ -132,36 +159,28 @@ public class Queries {
 
             stmt = c.createStatement();
 
-//            INSERT INTO userdata(name, age, weight, height, sex, calories, protein, carbs, fats, diet)
+//            INSERT INTO user(name, age, weight, height, sex, calories, protein, carbs, fats, diet)
 //            VALUES (5,5,5,5,'FEMALE',5,5,5,5,'VEGAN');
 
             String sql =
-                    "INSERT INTO userdata(name, age, weight, height, sex, calories, protein, carbs, fats, diet)" +
+                    "INSERT INTO user(name, age, weight, height, sex, calories, protein, carbs, fats, diet)" +
                             "VALUES ('" + name + "','" + age + "','" + weight + "','" + height + "','" + sex + "','" + calories +"','" + protein + "','" + carbs + "','" + fats + "','" + diet + "')";
-
-
 
             stmt.executeUpdate(sql);
             stmt.close();
             c.close();
 
-            TestClassInterop.addUserFoodTable(name);
+            addShoppingTable(name);
 
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
-            System.exit(0);
         }
     }
 
-    public static HashMap<Grocery, Integer> currentList(String userName) {
-        //TODO: return current users shopping list
-/*        SELECT food.id, name, subgroup, calories, protein, carbs, fat, diet, count FROM userfoodtable
-            JOIN food ON userfoodtable.foodkey = food.id
-            WHERE userfoodtable.id = (select id from userdata where name = 'a') AND count > 0 */
-
+    public static void currentList(String userName, HashMap<Grocery, Integer> list) {
         Connection c = null;
         Statement stmt = null;
-        HashMap<Grocery, Integer> list = null;
+        list.clear();
         try {
             Class.forName("org.postgresql.Driver");
             c = DriverManager
@@ -173,9 +192,9 @@ public class Queries {
             stmt = c.createStatement();
 
             String sql =
-                    "SELECT food.id, name, subgroup, calories, protein, carbs, fat, diet, count FROM userfoodtable" +
-                            "            JOIN food ON userfoodtable.foodkey = food.id" +
-                            "            WHERE userfoodtable.id = (select id from userdata where name = 'a') AND count > 0";
+                    "SELECT food.id, name, subgroup, calories, protein, carbs, fat, diet, count FROM shopping" +
+                            "            JOIN food ON shopping.foodid = food.id" +
+                            "            WHERE shopping.userid = (select id from user where name = " + userName + ") AND count > 0";
 
 //            ResultSet rs = stmt.executeQuery(sql);
 //            rs.next();
@@ -183,7 +202,6 @@ public class Queries {
 
 //            AND count > 0
 
-            list = new HashMap<Grocery, Integer>();
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
                 int id = rs.getInt(1);
@@ -220,8 +238,6 @@ public class Queries {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
             System.exit(0);
         }
-
-        return list;
     }
 
     public static void overwriteList(String userName, HashMap<Grocery, Integer> newList) {
@@ -250,9 +266,9 @@ public class Queries {
 
                 String sql =
 
-                        "UPDATE userfoodtable SET count = '"+count+"'" +
+                        "UPDATE shopping SET count = '"+count+"'" +
 
-                                "WHERE id IN (SELECT id FROM userdata WHERE userdata.name = '" + userName + "') AND userfoodtable.foodkey = '" + foodId + "' ";
+                                "WHERE userid IN (SELECT id FROM user WHERE user.name = '" + userName + "') AND shopping.foodid = '" + foodId + "' ";
 
 
 
