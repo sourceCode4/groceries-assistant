@@ -9,13 +9,52 @@ public class DatabaseBuilder {
     static String USER = "postgres";
     static String PASS = "ana"; //TODO: fill in your password here
 
+    public static void ana(){
+        try {
+            Class.forName("org.postgresql.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        try {
+            Connection init = DriverManager.getConnection("jdbc:postgresql://localhost:5432/", USER, PASS);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        Connection connection = null;
+        try {
+            connection = DriverManager.getConnection(DB_URL, USER, PASS);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        Statement stmt = null;
+        try {
+            stmt = connection.createStatement();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        String query = "";
+        query = "CREATE TABLE shopping7 " +
+                "(userid     INT NOT NULL," +
+                "foodid      INT NOT NULL," +
+                " COUNT            INT, " +
+                " PREF             FLOAT," +
+                " AMOUNT              INT," +
+                "PRIMARY KEY(userid, foodid))";
+        try {
+            stmt.execute(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        System.out.println("created shopping table");
+    }
+
     public static void build(){
         try {
             Class.forName("org.postgresql.Driver");
 
             Connection init = DriverManager.getConnection("jdbc:postgresql://localhost:5432/", USER, PASS);
             Statement initStmt = init.createStatement();
-            String query = "CREATE DATABASE TEST4";
+            String query = "CREATE DATABASE TEST6";
             initStmt.execute(query);
             initStmt.close();
             init.close();
@@ -24,7 +63,7 @@ public class DatabaseBuilder {
             Connection connection = DriverManager.getConnection(DB_URL, USER, PASS);
             Statement stmt = connection.createStatement();
 
-            query = "CREATE TABLE FOOD3 " +
+            query = "CREATE TABLE FOOD6 " +
                     "(id SERIAL PRIMARY KEY," +
                     " name VARCHAR(255), " +
                     " subgroup VARCHAR(255), " +
@@ -41,7 +80,7 @@ public class DatabaseBuilder {
 
             connection.setAutoCommit(false);
             //name, subgroup, Group, diet, calories, protein, carbs, fat
-            query = "INSERT INTO FOOD (name, subgroup, maingroup, diet, calories, protein, carbs, fat) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            query = "INSERT INTO FOOD6 (name, subgroup, maingroup, diet, calories, protein, carbs, fat) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement statement = connection.prepareStatement(query);
 
             BufferedReader lineReader = new BufferedReader(new FileReader(csvFilePath));
@@ -84,7 +123,7 @@ public class DatabaseBuilder {
 
             connection.setAutoCommit(true);
 
-            String sql =    "CREATE TABLE USERS" +
+            String sql =    "CREATE TABLE USERS6" +
                     "(id SERIAL PRIMARY KEY," +
                     " NAME TEXT UNIQUE NOT NULL," +
                     " HEIGHT            INT, " +
@@ -100,7 +139,7 @@ public class DatabaseBuilder {
             stmt.execute(sql);
             System.out.println("created user table");
 
-            query = "CREATE TABLE shopping " +
+            query = "CREATE TABLE shopping6 " +
                             "(userid     INT NOT NULL," +
                             "foodid      INT NOT NULL," +
                             " COUNT            INT, " +
