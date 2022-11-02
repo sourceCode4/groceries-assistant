@@ -163,8 +163,8 @@ public class Queries {
 //            c.commit();
     }
 
-    public List<String> searchGroceries(String username, String item) throws SQLException {
-        String query =  "SELECT food.id, food.name, shopping.pref FROM food " +
+    public List<Grocery> searchGroceries(String username, String item) throws SQLException {
+        String query =  "SELECT *, shopping.pref FROM food " +
                 "JOIN shopping ON food.id = foodid " +
                 "WHERE userid = (SELECT id FROM users WHERE name = '" + username +"') " +
                 "AND Subgroup = '" + item + "' "+
@@ -172,11 +172,20 @@ public class Queries {
                 "LIMIT 10";
         ResultSet rs = stmt.executeQuery(query);
 
-        ArrayList<String> list = new ArrayList<>();
+        ArrayList<Grocery> list = new ArrayList<>();
         while(rs.next()){
             //Display values
-            System.out.print("Name: " + rs.getString("Name"));
-            list.add((rs.getString("Name") + ", " + rs.getString("ID")));
+            Diet d = Diet.OMNIVORE;
+            switch(rs.getString("Diet")){
+                case ("Vegan"): d = Diet.VEGAN;
+                case ("Vegetarian"): d = Diet.VEGETARIAN;
+                case ("Pescaterian"): d = Diet.PESCETARIAN;
+            }
+            
+            Grocery g = new Grocery(rs.getInt("ID"), rs.getString("Name"), rs.getString("Subgroup"),
+                    new Nutrition(rs.getInt("Calories"), rs.getInt("Protein"),
+                            rs.getInt("Carbs"), rs.getInt("Fat"), d));
+            list.add(g);
         }
 
         return list;
