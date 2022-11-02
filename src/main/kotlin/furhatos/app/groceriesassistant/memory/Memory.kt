@@ -106,9 +106,9 @@ object Memory {
     }
 
     fun recommend(): List<Grocery> {
-        return listOf("snickers", "twix", "bueno").map {
-            Grocery(1, it, "chocolate", EmptyNutrition)
-        }
+        return database.recommendItems(userName)
+//        listOf("snickers", "twix", "bueno").map {
+//            Grocery(1, it, "chocolate", EmptyNutrition)
     }
 
     fun compatibility(item: Grocery, grams: Int): Compatibility {
