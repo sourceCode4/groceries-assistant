@@ -1,33 +1,48 @@
 package furhatos.app.groceriesassistant.flow.main
 
 import furhatos.app.groceriesassistant.flow.WithUser
-import furhatos.app.groceriesassistant.flow.events.control.AskMainQuestion
-import furhatos.app.groceriesassistant.flow.utils.alright
-import furhatos.app.groceriesassistant.nlu.DoGroceries
-import furhatos.app.groceriesassistant.nlu.EditList
-import furhatos.app.groceriesassistant.nlu.MakeList
-import furhatos.app.groceriesassistant.nlu.UpdateUserInfo
-import furhatos.flow.kotlin.furhat
-import furhatos.flow.kotlin.onResponse
-import furhatos.flow.kotlin.state
+import furhatos.app.groceriesassistant.flow.main.groceries.EditingList
+import furhatos.app.groceriesassistant.flow.main.groceries.NewList
+import furhatos.app.groceriesassistant.flow.main.groceries.NewOrExisting
+import furhatos.app.groceriesassistant.flow.main.user.UpdateUser
+import furhatos.app.groceriesassistant.flowUtils.alright
+import furhatos.app.groceriesassistant.flowUtils.askMainQuestion
+import furhatos.app.groceriesassistant.memory.Memory
+import furhatos.app.groceriesassistant.nlu.*
+import furhatos.flow.kotlin.*
 
 val SelectInteraction = state(WithUser) {
-    onEntry { raise(AskMainQuestion) }
+    init {
+        Memory.overloadCurrent()
+    }
 
-    onEvent<AskMainQuestion> { furhat.ask("What would you like to do?") }
+    askMainQuestion(utterance {
+        random {
+            +"what can i do for you?"
+            +"what do you want to do?"
+        }
+    })
 
     onResponse<DoGroceries> {
-        furhat.say("Do some ${it.intent.groceries}, okay")
-        goto(NewOrExisting)
+        if (it.intent.buy != null)
+            furhat.say("${it.intent.buy} some ${it.intent.groceries}, okay")
+        else {
+            furhat.say("${it.intent.groceries}, sure")
+        }
+        if (Memory.currentList().isNotEmpty())
+            goto(NewOrExisting)
+        else
+            goto(NewList)
+    }
+
+    onResponse<UpdateUserInfo> {
+        furhat.say(alright)
+        goto(UpdateUser)
     }
 
     onResponse<MakeList> { goto(NewList) }
 
     onResponse<EditList> { goto(EditingList) }
 
-    onResponse<UpdateUserInfo> {
-        //TODO: edit user info
-        furhat.say(alright)
-        reentry()
-    }
+    onResponse<Done> { raise(Exit()) }
 }
