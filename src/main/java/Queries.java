@@ -1,5 +1,4 @@
 import furhatos.app.groceriesassistant.memory.entity.*;
-
 import java.io.IOException;
 import java.sql.*;
 import java.util.*;
@@ -164,31 +163,39 @@ public class Queries {
 //            c.commit();
     }
 
-    public List<Grocery> searchGroceries(String username, String item) throws SQLException {
-        String query =  "SELECT * FROM FOOD WHERE Subgroup LIKE "+item;
+    public List<String> searchGroceries(String username, String item) throws SQLException {
+        String query =  "SELECT food.id, food.name, shopping.pref FROM food " +
+                "JOIN shopping ON food.id = foodid " +
+                "WHERE userid = (SELECT id FROM users WHERE name = '" + username +"') " +
+                "AND Subgroup = '" + item + "' "+
+                "ORDER BY pref DESC " +
+                "LIMIT 10";
         ResultSet rs = stmt.executeQuery(query);
 
-        ArrayList<Float> list = new ArrayList<>();
+        ArrayList<String> list = new ArrayList<>();
         while(rs.next()){
             //Display values
             System.out.print("Name: " + rs.getString("Name"));
-            list.add(Float.valueOf(rs.getString("Name")));
+            list.add((rs.getString("Name") + ", " + rs.getString("ID")));
         }
 
-        return null;
+        return list;
     }
 
-    public ArrayList<Float> getPreferenceVector(String userName) throws SQLException {
+    public ArrayList<String> getPreferenceVector(String userName) throws SQLException {
         //TODO: return this user's preference array,
         // with each index matching the primary key of the food
-        String query =  "SELECT pref FROM shopping " +
-                        "WHERE userid = " + userName;
-        ArrayList<Float> list = new ArrayList<>();
+        String query =  "SELECT foodid, pref FROM shopping8 " +
+                "WHERE userid = " + 0 +
+                " ORDER BY PREF" +
+                " LIMIT 10";
+        ArrayList<String> list = new ArrayList<>();
         ResultSet rs = stmt.executeQuery(query);
         while(rs.next()){
             //Display values
-            System.out.print("Preference: " + rs.getString("Preference"));
-            list.add(Float.valueOf(rs.getString("Preference")));
+            System.out.print("Preference: " + rs.getString("PREF"));
+            System.out.print("foodid: " + rs.getString("PREF"));
+            list.add((rs.getString("foodid")) + ", "+rs.getString("PREF"));
         }
 
         return list;
