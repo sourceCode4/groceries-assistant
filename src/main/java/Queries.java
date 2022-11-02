@@ -194,12 +194,6 @@ public class Queries {
                             "            JOIN food ON shopping.foodid = food.id" +
                             "            WHERE shopping.userid = (select id from users where name = '" + userName + "') AND count > 0";
 
-//            ResultSet rs = stmt.executeQuery(sql);
-//            rs.next();
-//            System.out.println(rs.getObject(8));
-
-//            AND count > 0
-
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
                 int id = rs.getInt(1);
@@ -242,32 +236,29 @@ public class Queries {
         //TODO: overwrite the current shopping list in the database with the new list
 
 
-        Connection c = null;
-        Statement stmt = null;
-        try {
+        try (Connection c = DriverManager.getConnection(URL, USER, PWD)) {
             Class.forName("org.postgresql.Driver");
-            c = DriverManager
-                    .getConnection(URL, USER, PWD); //Please use your own postgreSQL password
             System.out.println("connected");
+            Statement stmt = c.createStatement();
 
+            String query = "SELECT id FROM users WHERE name = '" + userName + "'";
+            int userId = stmt.executeQuery(query).getInt(1);
 
-            Iterator<HashMap.Entry<Grocery, Integer>> iterator = newList.entrySet().iterator();
-            while(iterator.hasNext()){
-                stmt = c.createStatement();
-                Map.Entry<Grocery, Integer> entry = iterator.next();
+            //c.setAutoCommit(false);
+
+            for (Map.Entry<Grocery, Integer> entry : newList.entrySet()) {
                 Grocery grocery = entry.getKey();
                 int count = entry.getValue();
                 int foodId = grocery.getId();
 
-                String sql =
-                        "UPDATE shopping SET count = '"+count+"'" +
-                                "WHERE userid IN (SELECT id FROM users WHERE users.name = '" + userName + "') AND shopping.foodid = '" + foodId + "' ";
+                query = "UPDATE shopping SET count = '" + count + "'" +
+                            "WHERE userid IN " + userId + " AND shopping.foodid = '" + foodId + "' ";
 
-                stmt.executeUpdate(sql);
+                stmt.executeUpdate(query);
                 stmt.close();
             }
 
-            c.close();
+//            c.commit();
 
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
