@@ -163,6 +163,26 @@ public class Queries {
 //            c.commit();
     }
 
+    private List<Grocery> toGroceryList(ResultSet rs) throws SQLException {
+        ArrayList<Grocery> list = new ArrayList<>();
+        while(rs.next()){
+            //Display values
+            Diet d = Diet.OMNIVORE;
+            switch(rs.getString("Diet")){
+                case ("Vegan"): d = Diet.VEGAN;
+                case ("Vegetarian"): d = Diet.VEGETARIAN;
+                case ("Pescaterian"): d = Diet.PESCETARIAN;
+            }
+
+            Grocery g = new Grocery(rs.getInt("id"), rs.getString("name"), rs.getString("subgroup"),
+                    new Nutrition(rs.getInt("calories"), rs.getInt("protein"),
+                            rs.getInt("carbs"), rs.getInt("fat"), d));
+            list.add(g);
+        }
+
+        return list;
+    }
+
     public List<Grocery> searchGroceries(String username, String item) throws SQLException {
         String query =  "SELECT *, shopping.pref FROM food " +
                 "JOIN shopping ON food.id = foodid " +
@@ -236,7 +256,15 @@ public class Queries {
 //        }
     }
 
-
+    public List<Grocery> recommendItems(String username) throws SQLException {
+        String query = "SELECT * FROM food " +
+                        "JOIN shopping ON food.id = foodid " +
+                        "WHERE userid = (SELECT id FROM users WHERE name = '" + username +"') " +
+                        "ORDER BY pref DESC " +
+                        "LIMIT 10";
+        ResultSet rs = stmt.executeQuery(query);
+        return toGroceryList(rs);
+    }
 
     public int[][] getItemsForRecommendation() throws SQLException {
         String query = "SELECT shopping userid, foodid, amount FROM shopping";
