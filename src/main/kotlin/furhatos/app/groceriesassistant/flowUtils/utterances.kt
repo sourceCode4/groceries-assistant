@@ -36,9 +36,10 @@ val recommend = utterance {
 }
 
 fun howMany(it: String = "") = utterance {
+    val ofIt = if (it == "") "" else "of $it"
     random {
-        +"how many $it do you want?"
-        +"how many $it would you like?"
-        +"how many?"
+        +"how many grams $ofIt do you want?"
+        +"how many grams $ofIt would you like?"
+        +"how many grams?"
     }
 }

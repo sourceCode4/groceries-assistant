@@ -76,6 +76,7 @@ fun GatherInfo(name: String) = state(Global) {
 
     onEvent<GotDiet> {
         furhat.say("perfect, i am ready to compose your first list!")
-        goto(WithUserPrelude)
+        Memory.setNewUser()
+        goto(OpenGui)
     }
 }

@@ -10,6 +10,7 @@ import furhatos.app.groceriesassistant.memory.Memory.getGroceryItems
 import furhatos.app.groceriesassistant.nlu.*
 import furhatos.app.groceriesassistant.flowUtils.askMainQuestion
 import furhatos.app.groceriesassistant.flowUtils.howMany
+import furhatos.app.groceriesassistant.memory.entity.Compatibility
 import furhatos.app.groceriesassistant.memory.entity.Grocery
 import furhatos.flow.kotlin.*
 import furhatos.nlu.common.Yes
@@ -18,8 +19,24 @@ import furhatos.nlu.common.Number
 
 val NewList = state(Groceries) {
     onEntry {
-        Memory.newList()
-        goto(EditingList)
+        furhat.ask("for how many days are you shopping?")
+    }
+
+    onResponse<Number> {
+        val days = it.intent.value ?: 0
+        if (days < 1) raise(DubiousResponse())
+        else {
+            Memory.newList(days)
+            furhat.say {
+                alright
+                +"for ${it.intent.value} "
+                +"day${
+                    if (days.toString().endsWith("11") ||
+                        !days.toString().endsWith("1")) "s"
+                    else ""
+                }"
+            }
+        }
     }
 }
 
@@ -81,29 +98,35 @@ val EditingList: State = state(Groceries) {
 }
 
 // Check that input.grocery != null before calling!!
-fun ChooseItem(input: QuantifiedGrocery, options: List<Grocery>) = state(Groceries) {
+fun ChooseItem(
+    input: QuantifiedGrocery,
+    options: List<Grocery>
+) = state(Groceries) {
     input.grocery!!
 
     onEntry {
         gui.clear()
-        options.forEach {
-            gui.append(it.name)
-        }
+        options.forEach { gui.append(it.name) }
         raise(AskMainQuestion)
     }
 
     options.forEach { option ->
         onResponse(option.name) {
-            var count = input.count?.value
-            if (count == null || input.isUnspecifiedPlural) {
-                count = call(HowMany(input.grocery.category?.text)) as Int? ?: 0
+            var grams = input.count?.value
+            if (grams == null || input.isUnspecifiedPlural) {
+                grams = call(HowMany(input.grocery.category?.text)) as Int? ?: 0
             }
             when {
-                count < 0 -> raise(DubiousResponse())
-                count > 1 -> furhat.say("$count ${input.grocery.text}")
+                grams < 0 -> raise(DubiousResponse())
+                grams > 1 -> furhat.say("$grams ${input.grocery.text}")
                 else -> furhat.say(option.name)
             }
-            Memory.addItem(option, count)
+            val cmp = Memory.compatibility(option, grams)
+            if (cmp != Compatibility.COMPATIBLE &&
+                call(AreYouSure(cmp)) as Boolean? == false
+            ) terminate(false)
+
+            Memory.addItem(option, grams)
             terminate(true)
         }
     }
@@ -146,3 +169,37 @@ fun HowMany(category: String?) = state(Groceries) {
         }
     }
 }
+
+fun AreYouSure(cmp: Compatibility) = state(Groceries) {
+    onEntry {
+        when (cmp) {
+            Compatibility.INCOMPATIBLE -> furhat.say(
+                "this item is not compatible with your diet " +
+                        "and it exceeds your calorie requirements")
+            Compatibility.CALORIES_EXCEEDED -> furhat.say(
+                "adding this item exceeds your energy requirements"
+            )
+            Compatibility.DIET_RESTRICTION -> furhat.say(
+                "this item is incompatible with your diet"
+            )
+            Compatibility.COMPATIBLE -> terminate(true)
+        }
+        raise(AskMainQuestion)
+    }
+    onEvent<AskMainQuestion> {
+        furhat.ask("are you sure you want to add this?")
+    }
+
+    onResponse("I am sure", "I am") { raise(Yes()) }
+
+    onResponse<Yes> {
+        furhat.say(alright)
+        terminate(true)
+    }
+
+    onResponse<No> {
+        furhat.say(alright)
+        terminate(false)
+    }
+}
+

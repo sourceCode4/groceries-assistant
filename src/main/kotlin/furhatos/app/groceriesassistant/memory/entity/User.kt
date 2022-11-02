@@ -21,9 +21,20 @@ data class User(
         this.nutrition = nutrition
     }
 
-    fun getDailyCalories(): Double = when (sex) {
+    private fun getDailyCalories(): Double = when (sex) {
         Sex.FEMALE -> 655 + 9.6 * weight + 1.8 * height - 4.7 * age
         Sex.MALE   -> 66 + 13.7 * weight + 5 * height - 6.8 * age
+    }
+
+    fun calculateNutrition() {
+        val cals = getDailyCalories().toInt()
+        this.nutrition = Nutrition(
+            cals,
+            (weight * 0.8).toInt(),
+            (cals * 0.45).toInt(),
+            (cals * 0.35).toInt(),
+            nutrition.diet
+        )
     }
 }
 enum class Sex { MALE, FEMALE }

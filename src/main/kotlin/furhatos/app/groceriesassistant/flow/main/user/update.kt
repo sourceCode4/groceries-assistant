@@ -44,4 +44,6 @@ val UpdateUser = state(WithUser) {
     }
 
     onEvent<GotInfo> { reentry() }
+
+    onExit { Memory.commitUser() }
 }

@@ -21,7 +21,7 @@ val IdentifyUser = state(Global) {
         val isUser = Memory.setUser(name)
         if (isUser) {
             furhat.say("Good to see you again $name!")
-            goto(WithUserPrelude)
+            goto(OpenGui)
         }
         else goto(NewUser(name))
     }

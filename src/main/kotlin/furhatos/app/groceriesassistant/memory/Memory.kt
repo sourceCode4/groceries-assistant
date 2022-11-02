@@ -1,10 +1,7 @@
 package furhatos.app.groceriesassistant.memory
 
 import Queries
-import furhatos.app.groceriesassistant.memory.entity.Grocery
-import furhatos.app.groceriesassistant.memory.entity.EmptyNutrition
-import furhatos.app.groceriesassistant.memory.entity.Nutrition
-import furhatos.app.groceriesassistant.memory.entity.User
+import furhatos.app.groceriesassistant.memory.entity.*
 import furhatos.app.groceriesassistant.nlu.FieldEnum
 import furhatos.app.groceriesassistant.nlu.Groceries
 import furhatos.app.groceriesassistant.nlu.GroceryKind
@@ -14,12 +11,13 @@ object Memory {
 
     private lateinit var user: User
     private val shoppingList: HashMap<Grocery, Int> = HashMap()
+    private var totalCalories = 0
+    private var days = 1
     private val userName get() = user.name
     fun initUser(name: String) {
         user = User(name = name)
         user.nutrition = EmptyNutrition
     }
-
 
     /**
      *  If a user under @name exists sets it to current and returns true,
@@ -49,16 +47,16 @@ object Memory {
     }
 
     fun commitUser() {
-        val user = user
+        user.calculateNutrition()
         Queries.updateUser(user)
     }
 
     /**
      *  Sets the new user to current and adds them to the database.
      */
-    fun setNewUser(user: User) {
+    fun setNewUser() {
+        user.calculateNutrition()
         Queries.addNewUser(user)
-        this.user = user
     }
 
     /**
@@ -98,33 +96,34 @@ object Memory {
             Grocery(0, "generic banana", "banana", EmptyNutrition),
             Grocery(1,  "generic $grocery", "generic", EmptyNutrition))
     }
-
-    fun getPreferenceVector() {
-        Queries.getPreferenceVector(userName)
-    }
-
-    fun setPreferenceVector() {
-        //TODO: return array of preferences
-    }
-
     fun currentList(): MutableMap<Grocery, Int> = shoppingList
 
-    fun addItem(item: Grocery, amount: Int = 1) {
+    fun addItem(item: Grocery, amount: Int = 100) {
         shoppingList[item] = (shoppingList[item] ?: 0) + amount
+        totalCalories += item.info.calories * (amount / 100)
     }
 
-    fun newList() {
+    fun newList(days: Int) {
+        this.days = days
+        totalCalories = 0
         shoppingList.clear()
     }
 
-    /**
-     *  Returns true if there was an entry with this item in the list
-     */
-    fun removeItem(item: Grocery): Boolean {
-        return shoppingList.remove(item) != null
+    fun recommend(): List<Grocery> {
+        return listOf("snickers", "twix", "bueno").map {
+            Grocery(1, it, "chocolate", EmptyNutrition)
+        }
     }
 
-    fun recommend(): List<Grocery> {
-        return listOf("snickers", "twix", "bueno").map{ Grocery(1, it, "chocolate", EmptyNutrition) }
+    fun compatibility(item: Grocery, grams: Int): Compatibility {
+        val dietary = item.info.diet.asInt <= user.nutrition.diet.asInt
+        val calorically =
+            item.info.calories * (grams / 100) + totalCalories <= user.nutrition.calories
+        return when (dietary to calorically) {
+            false to false -> Compatibility.INCOMPATIBLE
+            false to true  -> Compatibility.DIET_RESTRICTION
+            true to false  -> Compatibility.CALORIES_EXCEEDED
+            else           -> Compatibility.COMPATIBLE
+        }
     }
 }
