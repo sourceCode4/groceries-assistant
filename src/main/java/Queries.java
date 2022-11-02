@@ -1,5 +1,6 @@
 import furhatos.app.groceriesassistant.memory.entity.*;
 
+import java.io.IOException;
 import java.sql.*;
 import java.util.*;
 import java.sql.Connection;
@@ -12,63 +13,53 @@ import java.util.Objects;
 
 public class Queries {
 
-    static final String URL = "jdbc:postgresql://localhost:5432/groceriesassistant";
-    static final String USER = "postgres";
-    static final String PWD  = "admin";
-    public static User getUser(String name) {
-        //TODO: if the user with this name exists, return that,
-        //  otherwise return null
-        Connection c = null;
-        Statement stmt = null;
-        try {
-            Class.forName("org.postgresql.Driver");
-            c = DriverManager
-                    .getConnection(URL, USER, PWD); //Please use your own postgreSQL password
-            System.out.println("connected");
+    private final Connection c;
+    private final Statement stmt;
 
-
-            stmt = c.createStatement();
-
-            String sql =
-                    "SELECT *  FROM users WHERE users.name = '" + name +"'";
-
-            ResultSet rs = stmt.executeQuery(sql);
-
-            if (rs.next() == false){
-                return null;
-            }
-            rs.next();
-
-            String username = rs.getString(2);
-
-            int height = Integer.parseInt(rs.getString(3));
-            int weight = Integer.parseInt(rs.getString(4));
-            int age = Integer.parseInt(rs.getString(5));
-            Sex sex = Objects.equals(rs.getString(6), "MALE") ? Sex.MALE : Sex.FEMALE;
-
-            Nutrition nutrition = new Nutrition(-1,-1,-1,-1, Diet.VEGAN);
-
-            User user =new User(username,height,weight,age,sex,nutrition);
-
-            System.out.println(user);
-
-            stmt.close();
-            c.close();
-
-            return user;
-
-        } catch (Exception e) {
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
-            System.exit(0);
-        }
-
-        System.out.println("Opened database successfully");
-        System.out.println("Table created successfully");
-
-        return null;
+    public Queries() throws SQLException, ClassNotFoundException {
+        Class.forName("org.postgresql.Driver");
+        c = DriverManager.getConnection(URL, USER, PWD);
+        stmt = c.createStatement();
     }
 
-    public static void updateUser(User user) {
+    public void close() throws SQLException {
+        stmt.close();
+        c.close();
+    }
+
+    final String URL = "jdbc:postgresql://localhost:5432/groceriesassistant";
+    final String USER = "postgres";
+    final String PWD  = "admin";
+    public User getUser(String name) throws SQLException {
+        //TODO: if the user with this name exists, return that,
+        //  otherwise return null
+
+
+        String sql = "SELECT *  FROM users WHERE users.name = '" + name +"'";
+
+        ResultSet rs = stmt.executeQuery(sql);
+
+        if (rs.next() == false){
+            return null;
+        }
+
+        String username = rs.getString(2);
+
+        int height = Integer.parseInt(rs.getString(3));
+        int weight = Integer.parseInt(rs.getString(4));
+        int age = Integer.parseInt(rs.getString(5));
+        Sex sex = Objects.equals(rs.getString(6), "MALE") ? Sex.MALE : Sex.FEMALE;
+
+        Nutrition nutrition = new Nutrition(-1,-1,-1,-1, Diet.VEGAN);
+
+        User user = new User(username,height,weight,age,sex,nutrition);
+
+        System.out.println(user);
+
+        return user;
+    }
+
+    public void updateUser(User user) throws SQLException {
         //TODO:update the age, weight, height, sex and diet
         //assume it is an existing user
         String name = user.getName();
@@ -78,63 +69,23 @@ public class Queries {
         String sex= user.getSex().toString();
         Diet diet = user.getNutrition().getDiet();
 
-        Connection c = null;
-        Statement stmt = null;
-        try {
-            Class.forName("org.postgresql.Driver");
-            c = DriverManager
-                    .getConnection(URL, USER, PWD); //Please use your own postgreSQL password
-            System.out.println("connected");
+        String sql = "UPDATE users SET (age, weight, height, sex,diet) = " +
+                        "('" + age + "', '" + weight + "','" + height + "','" + sex + "','" + diet + "')" +
+                        "WHERE name = '" + name + "'";
 
-
-            stmt = c.createStatement();
-
-            String sql =
-                    "UPDATE users SET (age, weight, height, sex,diet) = ('" + age + "', '" + weight + "','" + height + "','" + sex + "','" + diet + "')" +
-                     "WHERE name = '" + name + "'";
-
-
-
-            stmt.executeUpdate(sql);
-            stmt.close();
-            c.close();
-
-        } catch (Exception e) {
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
-            System.exit(0);
-        }
-
-
+        stmt.executeUpdate(sql);
 
     }
-    public static void addShoppingTable(String x) throws ClassNotFoundException, SQLException {
-
-        Connection c = null;
-        Statement stmt = null;
-
-        Class.forName("org.postgresql.Driver");
-        c = DriverManager
-                .getConnection(URL, USER, PWD); //Please use your own postgreSQL password
-        System.out.println("connected");
-
-
-        stmt = c.createStatement();
-
-
+    public void addShoppingTable(String x) throws SQLException {
         String sql =
                 "INSERT INTO shopping(userid, foodid, COUNT, PREF)" +
                         "SELECT (SELECT id FROM users WHERE users.name = '" + x + "'), id, 0 as COUNT, 1 as PREF FROM FOOD";
 
         stmt.executeUpdate(sql);
-        stmt.close();
-        c.close();
-
-        System.out.println("Opened database successfully");
-        System.out.println("Table created successfully");
 
     }
 
-    public static void addNewUser(User user) {
+    public void addNewUser(User user) throws SQLException {
         //TODO:add this new user to the database
         String name = user.getName();
         int age = user.getAge();
@@ -147,166 +98,103 @@ public class Queries {
         int fats = user.getNutrition().getFats();
         Diet diet = user.getNutrition().getDiet();
 
+        String sql =
+                "INSERT INTO users(name, age, weight, height, sex, calories, protein, carbs, fats, diet)" +
+                        "VALUES ('" + name + "','" + age + "','" + weight + "','" + height + "','" + sex + "','" + calories +"','" + protein + "','" + carbs + "','" + fats + "','" + diet + "')";
 
-        Connection c = null;
-        Statement stmt = null;
-        try {
-            Class.forName("org.postgresql.Driver");
-            c = DriverManager
-                    .getConnection(URL, USER, PWD); //Please use your own postgreSQL password
-            System.out.println("connected");
+        stmt.executeUpdate(sql);
 
-
-            stmt = c.createStatement();
-
-//            INSERT INTO user(name, age, weight, height, sex, calories, protein, carbs, fats, diet)
-//            VALUES (5,5,5,5,'FEMALE',5,5,5,5,'VEGAN');
-
-            String sql =
-                    "INSERT INTO users(name, age, weight, height, sex, calories, protein, carbs, fats, diet)" +
-                            "VALUES ('" + name + "','" + age + "','" + weight + "','" + height + "','" + sex + "','" + calories +"','" + protein + "','" + carbs + "','" + fats + "','" + diet + "')";
-
-            stmt.executeUpdate(sql);
-            stmt.close();
-            c.close();
-
-            addShoppingTable(name);
-
-        } catch (Exception e) {
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
-        }
+        addShoppingTable(name);
     }
 
-    public static void currentList(String userName, HashMap<Grocery, Integer> list) {
-        Connection c = null;
-        Statement stmt = null;
+    public void currentList(String userName, HashMap<Grocery, Integer> list) throws SQLException {
         list.clear();
-        try {
-            Class.forName("org.postgresql.Driver");
-            c = DriverManager
-                    .getConnection(URL, USER, PWD); //Please use your own postgreSQL password
-            System.out.println("connected");
-
-
-            stmt = c.createStatement();
 
             String sql =
                     "SELECT food.id, name, subgroup, calories, protein, carbs, fat, diet, count FROM shopping" +
                             "            JOIN food ON shopping.foodid = food.id" +
                             "            WHERE shopping.userid = (select id from users where name = '" + userName + "') AND count > 0";
 
-            ResultSet rs = stmt.executeQuery(sql);
-            while (rs.next()) {
-                int id = rs.getInt(1);
-                String name = rs.getString(2);
-                String subgrounp = rs.getString(3);
-                String temp = rs.getObject(8).toString();
+        ResultSet rs = stmt.executeQuery(sql);
+        while (rs.next()) {
+            int id = rs.getInt(1);
+            String name = rs.getString(2);
+            String subgrounp = rs.getString(3);
+            String temp = rs.getObject(8).toString();
 
-                if (temp.equals("Vegan")) {
-                    Nutrition nutrition = new Nutrition(rs.getInt(4), rs.getInt(5), rs.getInt(6), rs.getInt(7), Diet.VEGAN);
-                    Grocery grocery = new Grocery(id, name, subgrounp, nutrition);
-                    list.put(grocery, rs.getInt(9));
-                } else if (temp.equals("Vegetarian")) {
-                    Nutrition nutrition = new Nutrition(rs.getInt(4), rs.getInt(5), rs.getInt(6), rs.getInt(7), Diet.VEGETARIAN);
-                    Grocery grocery = new Grocery(id, name, subgrounp, nutrition);
-                    list.put(grocery, rs.getInt(9));
-                } else if (temp.equals("Pescaterian")) {
-                    Nutrition nutrition = new Nutrition(rs.getInt(4), rs.getInt(5), rs.getInt(6), rs.getInt(7), Diet.PESCETARIAN);
-                    Grocery grocery = new Grocery(id, name, subgrounp, nutrition);
-                    list.put(grocery, rs.getInt(9));
-                } else if (temp.equals("Omnivore")) {
-                    Nutrition nutrition = new Nutrition(rs.getInt(4), rs.getInt(5), rs.getInt(6), rs.getInt(7), Diet.OMNIVORE);
-                    Grocery grocery = new Grocery(id, name, subgrounp, nutrition);
-                    list.put(grocery, rs.getInt(9));
+            if (temp.equals("Vegan")) {
+                Nutrition nutrition = new Nutrition(rs.getInt(4), rs.getInt(5), rs.getInt(6), rs.getInt(7), Diet.VEGAN);
+                Grocery grocery = new Grocery(id, name, subgrounp, nutrition);
+                list.put(grocery, rs.getInt(9));
+            } else if (temp.equals("Vegetarian")) {
+                Nutrition nutrition = new Nutrition(rs.getInt(4), rs.getInt(5), rs.getInt(6), rs.getInt(7), Diet.VEGETARIAN);
+                Grocery grocery = new Grocery(id, name, subgrounp, nutrition);
+                list.put(grocery, rs.getInt(9));
+            } else if (temp.equals("Pescaterian")) {
+                Nutrition nutrition = new Nutrition(rs.getInt(4), rs.getInt(5), rs.getInt(6), rs.getInt(7), Diet.PESCETARIAN);
+                Grocery grocery = new Grocery(id, name, subgrounp, nutrition);
+                list.put(grocery, rs.getInt(9));
+            } else if (temp.equals("Omnivore")) {
+                Nutrition nutrition = new Nutrition(rs.getInt(4), rs.getInt(5), rs.getInt(6), rs.getInt(7), Diet.OMNIVORE);
+                Grocery grocery = new Grocery(id, name, subgrounp, nutrition);
+                list.put(grocery, rs.getInt(9));
 
-                }
             }
-
-//            System.out.println(list);
-
-            stmt.close();
-            c.close();
-
-        } catch (Exception e) {
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
-            System.exit(0);
         }
     }
 
-    public static void overwriteList(String userName, HashMap<Grocery, Integer> newList) {
+    public void overwriteList(String userName, HashMap<Grocery, Integer> newList) throws SQLException {
         //TODO: overwrite the current shopping list in the database with the new list
 
+        String query = "SELECT id FROM users WHERE name = '" + userName + "'";
+        int userId = stmt.executeQuery(query).getInt(1);
 
-        try (Connection c = DriverManager.getConnection(URL, USER, PWD)) {
-            Class.forName("org.postgresql.Driver");
-            System.out.println("connected");
-            Statement stmt = c.createStatement();
+        //c.setAutoCommit(false);
 
-            String query = "SELECT id FROM users WHERE name = '" + userName + "'";
-            int userId = stmt.executeQuery(query).getInt(1);
+        for (Map.Entry<Grocery, Integer> entry : newList.entrySet()) {
+            Grocery grocery = entry.getKey();
+            int count = entry.getValue();
+            int foodId = grocery.getId();
 
-            //c.setAutoCommit(false);
+            query = "UPDATE shopping SET count = '" + count + "'" +
+                        "WHERE userid IN " + userId + " AND shopping.foodid = '" + foodId + "' ";
 
-            for (Map.Entry<Grocery, Integer> entry : newList.entrySet()) {
-                Grocery grocery = entry.getKey();
-                int count = entry.getValue();
-                int foodId = grocery.getId();
-
-                query = "UPDATE shopping SET count = '" + count + "'" +
-                            "WHERE userid IN " + userId + " AND shopping.foodid = '" + foodId + "' ";
-
-                stmt.executeUpdate(query);
-                stmt.close();
-            }
-
-//            c.commit();
-
-        } catch (Exception e) {
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
-            System.exit(0);
+            stmt.executeUpdate(query);
         }
+//            c.commit();
     }
 
-    public static List<Grocery> searchGroceries(String item) {
+    public List<Grocery> searchGroceries(String username, String item) throws SQLException {
         String query =  "SELECT * FROM FOOD WHERE Subgroup LIKE "+item;
-        try(Connection conn = DriverManager.getConnection(URL, USER, PWD);
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(query);
-        ){
-            ArrayList<Float> list = new ArrayList<>();
-            while(rs.next()){
-                //Display values
-                System.out.print("Name: " + rs.getString("Name"));
-                list.add(Float.valueOf(rs.getString("Name")));
-            }
-        } catch (SQLException e){
-            e.printStackTrace();
+        ResultSet rs = stmt.executeQuery(query);
+
+        ArrayList<Float> list = new ArrayList<>();
+        while(rs.next()){
+            //Display values
+            System.out.print("Name: " + rs.getString("Name"));
+            list.add(Float.valueOf(rs.getString("Name")));
         }
+
         return null;
     }
 
-    public static ArrayList<Float> getPreferenceVector(String userName) {
+    public ArrayList<Float> getPreferenceVector(String userName) throws SQLException {
         //TODO: return this user's preference array,
         // with each index matching the primary key of the food
         String query =  "SELECT pref FROM shopping " +
                         "WHERE userid = " + userName;
         ArrayList<Float> list = new ArrayList<>();
-        try(Connection conn = DriverManager.getConnection(URL, USER, PWD);
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(query);
-        ) {
-            while(rs.next()){
-                //Display values
-                System.out.print("Preference: " + rs.getString("Preference"));
-                list.add(Float.valueOf(rs.getString("Preference")));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        ResultSet rs = stmt.executeQuery(query);
+        while(rs.next()){
+            //Display values
+            System.out.print("Preference: " + rs.getString("Preference"));
+            list.add(Float.valueOf(rs.getString("Preference")));
         }
+
         return list;
     }
 
-    public static void setPreferenceVector() {
+    public void setPreferenceVector() {
         try {
             Process p = Runtime.getRuntime().exec("recommendations.py");
         } catch (IOException e) {
@@ -334,27 +222,21 @@ public class Queries {
 
 
 
-    public static int[][] getItemsForRecommendation(){
+    public int[][] getItemsForRecommendation() throws SQLException {
         String query = "SELECT shopping userid, foodid, amount FROM shopping";
         String query2 = "SELECT COUNT(*) FROM shopping";
-        try(Connection conn = DriverManager.getConnection(URL, USER, PWD);
-            Statement stmt = conn.createStatement();
-            ResultSet count = stmt.executeQuery(query2);
-            ResultSet rs = stmt.executeQuery(query);
-        ) {
-            count.next();
-            int num = count.getInt(1);
-            int[][] result = new int[num][3];
-            for(int i = 0; i<num; i++){
-                rs.next();
-                result[i][0] = rs.getInt(1);
-                result[i][1] = rs.getInt(2);
-                result[i][2] = rs.getInt(3);
-            }
-            return result;
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
+        ResultSet count = stmt.executeQuery(query2);
+        ResultSet rs = stmt.executeQuery(query);
+
+        count.next();
+        int num = count.getInt(1);
+        int[][] result = new int[num][3];
+        for(int i = 0; i<num; i++){
+            rs.next();
+            result[i][0] = rs.getInt(1);
+            result[i][1] = rs.getInt(2);
+            result[i][2] = rs.getInt(3);
         }
-        return null;
+        return result;
     }
 }

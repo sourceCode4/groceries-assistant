@@ -3,13 +3,13 @@ package furhatos.app.groceriesassistant.memory
 import Queries
 import furhatos.app.groceriesassistant.memory.entity.*
 import furhatos.app.groceriesassistant.nlu.FieldEnum
-import furhatos.app.groceriesassistant.nlu.Groceries
 import furhatos.app.groceriesassistant.nlu.GroceryKind
 import furhatos.app.groceriesassistant.nlu.UserFieldValue
 
 object Memory {
 
     private lateinit var user: User
+    private val database = Queries()
     private val shoppingList: HashMap<Grocery, Int> = HashMap()
     private var totalCalories = 0
     private var days = 1
@@ -24,7 +24,7 @@ object Memory {
      *  otherwise returns false
      */
     fun setUser(name: String): Boolean {
-        val user = Queries.getUser(name)
+        val user = database.getUser(name)
         return if (user != null) {
             this.user = user
             true
@@ -48,7 +48,7 @@ object Memory {
 
     fun commitUser() {
         user.calculateNutrition()
-        Queries.updateUser(user)
+        database.updateUser(user)
     }
 
     /**
@@ -56,14 +56,14 @@ object Memory {
      */
     fun setNewUser() {
         user.calculateNutrition()
-        Queries.addNewUser(user)
+        database.addNewUser(user)
     }
 
     /**
      * Loads user's current list from the database.
      */
     fun overloadCurrent() {
-        Queries.currentList(userName, shoppingList)
+        database.currentList(userName, shoppingList)
     }
 
     /**
@@ -72,7 +72,7 @@ object Memory {
      */
     fun commit() {
         if (shoppingList.isNotEmpty())
-            Queries.overwriteList(user.name, shoppingList)
+            database.overwriteList(user.name, shoppingList)
     }
 
     fun getKinds(): List<String> {
@@ -88,7 +88,7 @@ object Memory {
      */
     fun GroceryKind.getGroceryItems(): List<Grocery> {
         val grocery = this.text
-        return Queries.searchGroceries(userName, grocery)
+        return database.searchGroceries(userName, grocery)
 //             listOf(Grocery(0, "generic banana", "banana", EmptyNutrition),
 //                   Grocery(1,  "generic $grocery", "generic", EmptyNutrition))
     }
