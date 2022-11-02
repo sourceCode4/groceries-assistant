@@ -184,31 +184,14 @@ public class Queries {
     }
 
     public List<Grocery> searchGroceries(String username, String item) throws SQLException {
-        String query =  "SELECT *, shopping.pref FROM food " +
+        String query =  "SELECT * FROM food " +
                 "JOIN shopping ON food.id = foodid " +
                 "WHERE userid = (SELECT id FROM users WHERE name = '" + username +"') " +
-                "AND Subgroup = '" + item + "' "+
+                "AND Subgroup ILIKE '" + item + "' "+
                 "ORDER BY pref DESC " +
                 "LIMIT 10";
         ResultSet rs = stmt.executeQuery(query);
-
-        ArrayList<Grocery> list = new ArrayList<>();
-        while(rs.next()){
-            //Display values
-            Diet d = Diet.OMNIVORE;
-            switch(rs.getString("Diet")){
-                case ("Vegan"): d = Diet.VEGAN;
-                case ("Vegetarian"): d = Diet.VEGETARIAN;
-                case ("Pescaterian"): d = Diet.PESCETARIAN;
-            }
-            
-            Grocery g = new Grocery(rs.getInt("ID"), rs.getString("Name"), rs.getString("Subgroup"),
-                    new Nutrition(rs.getInt("Calories"), rs.getInt("Protein"),
-                            rs.getInt("Carbs"), rs.getInt("Fat"), d));
-            list.add(g);
-        }
-
-        return list;
+        return toGroceryList(rs);
     }
 
     public ArrayList<String> getPreferenceVector(String userName) throws SQLException {
