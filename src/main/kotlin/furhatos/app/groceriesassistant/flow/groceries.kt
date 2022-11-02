@@ -1,8 +1,8 @@
 package furhatos.app.groceriesassistant.flow
 
 import furhatos.app.groceriesassistant.flow.main.Idle
-import furhatos.app.groceriesassistant.flow.main.NewList
 import furhatos.app.groceriesassistant.flow.main.SelectInteraction
+import furhatos.app.groceriesassistant.flow.main.groceries.NewList
 import furhatos.app.groceriesassistant.flowUtils.alright
 import furhatos.app.groceriesassistant.flowUtils.askMainQuestion
 import furhatos.app.groceriesassistant.memory.Memory

@@ -1,8 +1,10 @@
-package furhatos.app.groceriesassistant.flow.main
+package furhatos.app.groceriesassistant.flow.main.user
 
 import furhatos.app.groceriesassistant.flow.Global
 import furhatos.app.groceriesassistant.events.control.*
 import furhatos.app.groceriesassistant.flow.UserInfo
+import furhatos.app.groceriesassistant.flow.main.Idle
+import furhatos.app.groceriesassistant.flow.main.user.OpenGui
 import furhatos.app.groceriesassistant.memory.Memory
 import furhatos.app.groceriesassistant.flowUtils.sayAndAskMain
 import furhatos.flow.kotlin.*

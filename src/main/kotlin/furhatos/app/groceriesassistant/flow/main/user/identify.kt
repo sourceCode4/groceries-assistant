@@ -1,6 +1,7 @@
-package furhatos.app.groceriesassistant.flow.main
+package furhatos.app.groceriesassistant.flow.main.user
 
 import furhatos.app.groceriesassistant.flow.Global
+import furhatos.app.groceriesassistant.flow.main.Idle
 import furhatos.app.groceriesassistant.memory.Memory
 import furhatos.app.groceriesassistant.flowUtils.greeting
 import furhatos.app.groceriesassistant.flowUtils.sayAndAskMain

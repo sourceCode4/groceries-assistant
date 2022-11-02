@@ -1,4 +1,4 @@
-package furhatos.app.groceriesassistant.flow.main
+package furhatos.app.groceriesassistant.flow.main.groceries
 
 import furhatos.app.groceriesassistant.flow.Groceries
 import furhatos.app.groceriesassistant.events.control.AskMainQuestion

@@ -1,4 +1,4 @@
-package furhatos.app.groceriesassistant.flow.main
+package furhatos.app.groceriesassistant.flow.main.user
 
 import furhatos.app.groceriesassistant.events.control.*
 import furhatos.app.groceriesassistant.flow.UserInfo
