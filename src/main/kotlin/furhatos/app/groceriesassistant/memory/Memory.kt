@@ -63,8 +63,6 @@ object Memory {
      * Loads user's current list from the database.
      */
     fun overloadCurrent() {
-        //val name = user.name
-        //TODO: return current shopping list (in hash map of grocery objects to ints)
         Queries.currentList(userName, shoppingList)
     }
 
@@ -72,10 +70,9 @@ object Memory {
      *  If the current list is nonempty, saves it to the database and returns true,
      *  otherwise returns false
      */
-    fun commit(): Boolean {
-        if (shoppingList.isEmpty()) return false
-        //TODO: put a shopping list into the database
-        return true
+    fun commit() {
+        if (shoppingList.isNotEmpty())
+            Queries.overwriteList(user.name, shoppingList)
     }
 
     fun getKinds(): List<String> {
@@ -91,10 +88,9 @@ object Memory {
      */
     fun GroceryKind.getGroceryItems(): List<Grocery> {
         val grocery = this.text
-        //TODO: search the database
-        return listOf(
-            Grocery(0, "generic banana", "banana", EmptyNutrition),
-            Grocery(1,  "generic $grocery", "generic", EmptyNutrition))
+        return Queries.searchGroceries(userName, grocery)
+//             listOf(Grocery(0, "generic banana", "banana", EmptyNutrition),
+//                   Grocery(1,  "generic $grocery", "generic", EmptyNutrition))
     }
     fun currentList(): MutableMap<Grocery, Int> = shoppingList
 
