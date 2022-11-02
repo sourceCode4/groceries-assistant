@@ -1,5 +1,6 @@
 package furhatos.app.groceriesassistant
 
+import Queries
 import furhatos.app.groceriesassistant.flow.Init
 import furhatos.skills.Skill
 import furhatos.flow.kotlin.*
