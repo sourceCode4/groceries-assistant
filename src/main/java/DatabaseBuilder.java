@@ -33,7 +33,7 @@ public class DatabaseBuilder {
             e.printStackTrace();
         }
         String query = "";
-        query = "CREATE TABLE shopping8 " +
+        query = "CREATE TABLE shopping " +
                 "(userid     INT NOT NULL," +
                 "foodid      INT NOT NULL," +
                 " COUNT            INT, " +
@@ -63,7 +63,7 @@ public class DatabaseBuilder {
             Connection connection = DriverManager.getConnection(DB_URL, USER, PASS);
             Statement stmt = connection.createStatement();
 
-            query = "CREATE TABLE FOOD6 " +
+            query = "CREATE TABLE food " +
                     "(id SERIAL PRIMARY KEY," +
                     " name VARCHAR(255), " +
                     " subgroup VARCHAR(255), " +
@@ -80,7 +80,7 @@ public class DatabaseBuilder {
 
             connection.setAutoCommit(false);
             //name, subgroup, Group, diet, calories, protein, carbs, fat
-            query = "INSERT INTO FOOD6 (name, subgroup, maingroup, diet, calories, protein, carbs, fat) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            query = "INSERT INTO food (name, subgroup, maingroup, diet, calories, protein, carbs, fat) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement statement = connection.prepareStatement(query);
 
             BufferedReader lineReader = new BufferedReader(new FileReader(csvFilePath));
@@ -123,7 +123,7 @@ public class DatabaseBuilder {
 
             connection.setAutoCommit(true);
 
-            String sql =    "CREATE TABLE USERS6" +
+            String sql = "CREATE TABLE users" +
                     "(id SERIAL PRIMARY KEY," +
                     " NAME TEXT UNIQUE NOT NULL," +
                     " HEIGHT            INT, " +
@@ -139,7 +139,7 @@ public class DatabaseBuilder {
             stmt.execute(sql);
             System.out.println("created user table");
 
-            query = "CREATE TABLE shopping6 " +
+            query = "CREATE TABLE shopping " +
                             "(userid     INT NOT NULL," +
                             "foodid      INT NOT NULL," +
                             " COUNT            INT, " +
