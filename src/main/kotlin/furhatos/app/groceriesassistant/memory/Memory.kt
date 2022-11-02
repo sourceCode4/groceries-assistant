@@ -1,21 +1,22 @@
 package furhatos.app.groceriesassistant.memory
 
-import furhatos.app.groceriesassistant.memory.entity.Grocery
-import furhatos.app.groceriesassistant.memory.entity.User
-import furhatos.app.groceriesassistant.nlu.GroceryKindEntity
-import furhatos.nlu.common.Date
-import java.time.LocalDate
+import Queries
+import furhatos.app.groceriesassistant.memory.entity.*
+import furhatos.app.groceriesassistant.nlu.FieldEnum
+import furhatos.app.groceriesassistant.nlu.GroceryKind
+import furhatos.app.groceriesassistant.nlu.UserFieldValue
 
 object Memory {
 
-    private val state = object {
-        lateinit var user: User
-        /**
-         *  for how many days the groceries should last, max 7
-         *  use this to calculate the required amount of groceries when composing a list
-         */
-        var duration: Int = 0
-        var shoppingList: MutableMap<Grocery, Int> = mutableMapOf()
+    private lateinit var user: User
+    private val database = Queries()
+    private val shoppingList: HashMap<Grocery, Int> = HashMap()
+    private var totalCalories = 0
+    private var days = 1
+    private val userName get() = user.name
+    fun initUser(name: String) {
+        user = User(name = name)
+        user.nutrition = EmptyNutrition
     }
 
     /**
@@ -23,73 +24,102 @@ object Memory {
      *  otherwise returns false
      */
     fun setUser(name: String): Boolean {
-        //TODO
+        val user = database.getUser(name)
+        return if (user != null) {
+            this.user = user
+            true
+        } else
+            false
+    }
+    fun updateUser(field: FieldEnum?, value: UserFieldValue): Boolean {
+        with (user) {
+            when (field) {
+                //"name" -> name = value.name?.text ?: return false
+                FieldEnum.HEIGHT -> height = value.number?.value ?: return false
+                FieldEnum.WEIGHT -> weight = value.number?.value ?: return false
+                FieldEnum.AGE  -> age = value.number?.value ?: return false
+                FieldEnum.SEX  -> sex = value.sex?.enum ?: return false
+                FieldEnum.DIET -> nutrition.diet = value.diet?.memoryEntity ?: return false
+                else -> return false
+            }
+        }
         return true
     }
 
-    fun getUser(): User = state.user
+    fun commitUser() {
+        user.calculateNutrition()
+        database.updateUser(user)
+    }
 
     /**
      *  Sets the new user to current and adds them to the database.
      */
-    fun setNewUser(user: User) {
-        //TODO
-    }
-
-    fun addItem(item: Grocery, amount: Int = 1) {
-        state.shoppingList[item] = (state.shoppingList[item] ?: 0) + amount
+    fun setNewUser() {
+        user.calculateNutrition()
+        database.addNewUser(user)
     }
 
     /**
-     *  Returns true if there was an entry with this item in the list
+     * Loads user's current list from the database.
      */
-    fun removeItem(item: Grocery): Boolean {
-        return state.shoppingList.remove(item) != null
-    }
-
-    fun newList(archiveCurrent: Boolean) {
-        if (archiveCurrent) {
-            //TODO: save current list to the database
-        }
-        state.shoppingList.clear()
-    }
-
-    /**
-     *  Return the list from the given date, if it doesn't exist return null
-     */
-    fun retrieveList(dateEntity: Date): List<Grocery>? {
-        val date = dateEntity.asLocalDate() ?: return null
-        //TODO: use the date to retrieve from the database
-        return null
-    }
-
-    /**
-     *  Forgets the list and returns true if it exists,
-     *  false otherwise
-     */
-    fun forgetList(dateEntity: Date): Boolean {
-        val date = dateEntity.asLocalDate() ?: return false
-        //TODO: forget the list or return false if there is none
-        return true
+    fun overloadCurrent() {
+        database.currentList(userName, shoppingList)
     }
 
     /**
      *  If the current list is nonempty, saves it to the database and returns true,
      *  otherwise returns false
      */
-    fun commit(): Boolean {
-        if (state.shoppingList.isEmpty()) return false
-        //TODO: commit the current list to the database
-        return true
+    fun commit() {
+        if (shoppingList.isNotEmpty())
+            database.overwriteList(user.name, shoppingList)
+    }
+
+    fun getKinds(): List<String> {
+        //TODO: temp for testing, call the database
+        return listOf("banana", "apple", "tomato", "chocolate", "ice cream", "fish",
+            "salmon", "tuna", "steak", "burger", "veggie_burger:veggie burger, vegetarian burger",
+            "mayonnaise:mayonnaise,mayo")
     }
 
     /**
      *  Retrieves grocery items from the database that match the grocery entity
      *  asked for by the user
      */
-    fun getGroceryItems(entity: GroceryKindEntity): List<Grocery> {
-        val grocery = entity.text
-        //TODO: search the database for the text
-        return listOf()
+    fun GroceryKind.getGroceryItems(): List<Grocery> {
+        val grocery = this.text
+        return database.searchGroceries(userName, grocery)
+//             listOf(Grocery(0, "generic banana", "banana", EmptyNutrition),
+//                   Grocery(1,  "generic $grocery", "generic", EmptyNutrition))
+    }
+    fun currentList(): MutableMap<Grocery, Int> = shoppingList
+
+    fun addItem(item: Grocery, amount: Int = 100) {
+        shoppingList[item] = (shoppingList[item] ?: 0) + amount
+        totalCalories += item.info.calories * (amount / 100)
+    }
+
+    fun newList(days: Int) {
+        this.days = days
+        totalCalories = 0
+        shoppingList.clear()
+    }
+
+    fun recommend(): List<Grocery> {
+        return database.recommendItems(userName)
+//        listOf("snickers", "twix", "bueno").map {
+//            Grocery(1, it, "chocolate", EmptyNutrition)
+    }
+
+    fun compatibility(item: Grocery, grams: Int): Compatibility {
+        val dietary = item.info.diet.asInt <= user.nutrition.diet.asInt
+        val calorically =
+            item.info.calories * (grams / 100) + totalCalories <= user.nutrition.calories
+        return when (dietary to calorically) {
+            false to false -> Compatibility.INCOMPATIBLE
+            false to true  -> Compatibility.DIET_RESTRICTION
+            true to false  -> Compatibility.CALORIES_EXCEEDED
+            else           -> Compatibility.COMPATIBLE
+        }
     }
 }

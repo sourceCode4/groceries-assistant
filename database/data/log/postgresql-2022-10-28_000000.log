@@ -1,0 +1,18 @@
+2022-10-28 22:58:12.232 GMT [6792] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2022-10-28 22:58:17.013 GMT [11936] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2022-10-28 22:59:40.653 GMT [5408] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2022-10-28 23:08:00.898 GMT [14248] LOG:  checkpoint starting: time
+2022-10-28 23:08:05.264 GMT [14248] LOG:  checkpoint complete: wrote 42 buffers (0.3%); 0 WAL file(s) added, 0 removed, 0 recycled; write=4.331 s, sync=0.026 s, total=4.369 s; sync files=32, longest=0.002 s, average=0.001 s; distance=159 kB, estimate=159 kB
+2022-10-28 23:17:03.325 GMT [7692] ERROR:  relation "shoppinglist" already exists
+2022-10-28 23:17:03.325 GMT [7692] STATEMENT:  CREATE TABLE SHOPPINGLIST (ID INT PRIMARY KEY     NOT NULL, NAME           TEXT    NOT NULL,  ITEM           TEXT     NOT NULL,  ADDRESS        CHAR(50),  PRICE          FLOAT)
+2022-10-28 23:17:03.683 GMT [7692] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2022-10-28 23:18:00.266 GMT [14248] LOG:  checkpoint starting: time
+2022-10-28 23:18:03.388 GMT [14248] LOG:  checkpoint complete: wrote 31 buffers (0.2%); 0 WAL file(s) added, 0 removed, 0 recycled; write=3.039 s, sync=0.049 s, total=3.123 s; sync files=25, longest=0.020 s, average=0.002 s; distance=133 kB, estimate=156 kB
+2022-10-28 23:30:28.492 GMT [12648] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2022-10-28 23:30:28.492 GMT [9504] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	

@@ -1,22 +1,24 @@
 package furhatos.app.groceriesassistant.flow
 
-import furhatos.app.groceriesassistant.flow.main.NewList
-import furhatos.app.groceriesassistant.flow.main.EditingList
+import furhatos.app.groceriesassistant.events.control.DubiousResponse
 import furhatos.app.groceriesassistant.flow.main.SelectInteraction
-import furhatos.app.groceriesassistant.flow.utils.alright
-import furhatos.app.groceriesassistant.nlu.EditList
-import furhatos.app.groceriesassistant.nlu.Exit
-import furhatos.app.groceriesassistant.nlu.MakeList
+import furhatos.app.groceriesassistant.nlu.Done
+import furhatos.app.groceriesassistant.flowUtils.alright
 import furhatos.flow.kotlin.*
+import furhatos.skills.HostedGUI
+
+var gui = HostedGUI("gui")
 
 val WithUser: State = state(Global) {
 
-    onResponse<MakeList> { goto(NewList) }
+    onEvent<DubiousResponse> {
+        furhat.say(random("don't be silly", "that doesn't seem right"))
+        reentry()
+    }
 
-    onResponse<EditList> { goto(EditingList) }
-
-    onResponse<Exit> {
+    onResponse<Done> {
         furhat.say(alright)
+        gui.clear()
         goto(SelectInteraction)
     }
 }
