@@ -1,26 +1,22 @@
 package furhatos.app.groceriesassistant.memory
 
 import Queries
-import furhatos.app.groceriesassistant.memory.entity.Grocery
-import furhatos.app.groceriesassistant.memory.entity.EmptyNutrition
-import furhatos.app.groceriesassistant.memory.entity.Nutrition
-import furhatos.app.groceriesassistant.memory.entity.User
+import furhatos.app.groceriesassistant.memory.entity.*
 import furhatos.app.groceriesassistant.nlu.FieldEnum
+import furhatos.app.groceriesassistant.nlu.Groceries
 import furhatos.app.groceriesassistant.nlu.GroceryKind
 import furhatos.app.groceriesassistant.nlu.UserFieldValue
 
 object Memory {
 
-    private val state = object {
-        lateinit var user: User
-        val userName get() = user.name
-
-        val shoppingList: MutableMap<Grocery, Int> = mutableMapOf()
-    }
-
+    private lateinit var user: User
+    private val shoppingList: HashMap<Grocery, Int> = HashMap()
+    private var totalCalories = 0
+    private var days = 1
+    private val userName get() = user.name
     fun initUser(name: String) {
-        state.user = User(name = name)
-        state.user.nutrition = EmptyNutrition
+        user = User(name = name)
+        user.nutrition = EmptyNutrition
     }
 
     /**
@@ -30,13 +26,13 @@ object Memory {
     fun setUser(name: String): Boolean {
         val user = Queries.getUser(name)
         return if (user != null) {
-            state.user = user
+            this.user = user
             true
         } else
             false
     }
     fun updateUser(field: FieldEnum?, value: UserFieldValue): Boolean {
-        with (state.user) {
+        with (user) {
             when (field) {
                 //"name" -> name = value.name?.text ?: return false
                 FieldEnum.HEIGHT -> height = value.number?.value ?: return false
@@ -51,34 +47,39 @@ object Memory {
     }
 
     fun commitUser() {
-        val user = state.user
+        user.calculateNutrition()
         Queries.updateUser(user)
     }
 
     /**
      *  Sets the new user to current and adds them to the database.
      */
-    fun setNewUser(user: User) {
+    fun setNewUser() {
+        user.calculateNutrition()
         Queries.addNewUser(user)
-        state.user = user
     }
 
     /**
      * Loads user's current list from the database.
      */
     fun overloadCurrent() {
-        //val name = state.user.name
-        //TODO: return current shopping list (in hash map of grocery objects to ints)
+        Queries.currentList(userName, shoppingList)
     }
 
     /**
      *  If the current list is nonempty, saves it to the database and returns true,
      *  otherwise returns false
      */
-    fun commit(): Boolean {
-        if (state.shoppingList.isEmpty()) return false
-        //TODO: put a shopping list into the database
-        return true
+    fun commit() {
+        if (shoppingList.isNotEmpty())
+            Queries.overwriteList(user.name, shoppingList)
+    }
+
+    fun getKinds(): List<String> {
+        //TODO: temp for testing, call the database
+        return listOf("banana", "apple", "tomato", "chocolate", "ice cream", "fish",
+            "salmon", "tuna", "steak", "burger", "veggie_burger:veggie burger, vegetarian burger",
+            "mayonnaise:mayonnaise,mayo")
     }
 
     /**
@@ -87,34 +88,38 @@ object Memory {
      */
     fun GroceryKind.getGroceryItems(): List<Grocery> {
         val grocery = this.text
-        //TODO: search the database
-        return listOf(
-            Grocery(0, "generic banana", "banana", EmptyNutrition),
-            Grocery(1,  "generic $grocery", this.category?.text!!, EmptyNutrition))
+        return Queries.searchGroceries(userName, grocery)
+//             listOf(Grocery(0, "generic banana", "banana", EmptyNutrition),
+//                   Grocery(1,  "generic $grocery", "generic", EmptyNutrition))
+    }
+    fun currentList(): MutableMap<Grocery, Int> = shoppingList
+
+    fun addItem(item: Grocery, amount: Int = 100) {
+        shoppingList[item] = (shoppingList[item] ?: 0) + amount
+        totalCalories += item.info.calories * (amount / 100)
     }
 
-    fun getPreferenceVector() {
-        Queries.getPreferenceVector(state.userName)
+    fun newList(days: Int) {
+        this.days = days
+        totalCalories = 0
+        shoppingList.clear()
     }
 
-    fun setPreferenceVector() {
-        //TODO: return array of preferences
+    fun recommend(): List<Grocery> {
+        return listOf("snickers", "twix", "bueno").map {
+            Grocery(1, it, "chocolate", EmptyNutrition)
+        }
     }
 
-    fun currentList(): MutableMap<Grocery, Int> = state.shoppingList
-
-    fun addItem(item: Grocery, amount: Int = 1) {
-        state.shoppingList[item] = (state.shoppingList[item] ?: 0) + amount
-    }
-
-    fun newList() {
-        state.shoppingList.clear()
-    }
-
-    /**
-     *  Returns true if there was an entry with this item in the list
-     */
-    fun removeItem(item: Grocery): Boolean {
-        return state.shoppingList.remove(item) != null
+    fun compatibility(item: Grocery, grams: Int): Compatibility {
+        val dietary = item.info.diet.asInt <= user.nutrition.diet.asInt
+        val calorically =
+            item.info.calories * (grams / 100) + totalCalories <= user.nutrition.calories
+        return when (dietary to calorically) {
+            false to false -> Compatibility.INCOMPATIBLE
+            false to true  -> Compatibility.DIET_RESTRICTION
+            true to false  -> Compatibility.CALORIES_EXCEEDED
+            else           -> Compatibility.COMPATIBLE
+        }
     }
 }

@@ -1,6 +1,5 @@
 import furhatos.app.groceriesassistant.memory.entity.*;
 
-import java.io.IOException;
 import java.sql.*;
 import java.util.*;
 import java.sql.Connection;
@@ -15,9 +14,7 @@ public class Queries {
 
     static final String URL = "jdbc:postgresql://localhost:5432/groceriesassistant";
     static final String USER = "postgres";
-    static final String PWD  = "ana";
-
-
+    static final String PWD  = "admin";
     public static User getUser(String name) {
         //TODO: if the user with this name exists, return that,
         //  otherwise return null
@@ -33,7 +30,7 @@ public class Queries {
             stmt = c.createStatement();
 
             String sql =
-                    "SELECT *  FROM user WHERE user.name = '" + name +"'";
+                    "SELECT *  FROM users WHERE users.name = '" + name +"'";
 
             ResultSet rs = stmt.executeQuery(sql);
 
@@ -93,7 +90,7 @@ public class Queries {
             stmt = c.createStatement();
 
             String sql =
-                    "UPDATE user SET (age, weight, height, sex,diet) = ('" + age + "', '" + weight + "','" + height + "','" + sex + "','" + diet + "')" +
+                    "UPDATE users SET (age, weight, height, sex,diet) = ('" + age + "', '" + weight + "','" + height + "','" + sex + "','" + diet + "')" +
                      "WHERE name = '" + name + "'";
 
 
@@ -126,7 +123,7 @@ public class Queries {
 
         String sql =
                 "INSERT INTO shopping(userid, foodid, COUNT, PREF)" +
-                        "SELECT (SELECT id FROM user WHERE user.name = '" + x + "'), id, 0 as COUNT, 1 as PREF FROM FOOD";
+                        "SELECT (SELECT id FROM users WHERE users.name = '" + x + "'), id, 0 as COUNT, 1 as PREF FROM FOOD";
 
         stmt.executeUpdate(sql);
         stmt.close();
@@ -166,7 +163,7 @@ public class Queries {
 //            VALUES (5,5,5,5,'FEMALE',5,5,5,5,'VEGAN');
 
             String sql =
-                    "INSERT INTO user(name, age, weight, height, sex, calories, protein, carbs, fats, diet)" +
+                    "INSERT INTO users(name, age, weight, height, sex, calories, protein, carbs, fats, diet)" +
                             "VALUES ('" + name + "','" + age + "','" + weight + "','" + height + "','" + sex + "','" + calories +"','" + protein + "','" + carbs + "','" + fats + "','" + diet + "')";
 
             stmt.executeUpdate(sql);
@@ -196,13 +193,7 @@ public class Queries {
             String sql =
                     "SELECT food.id, name, subgroup, calories, protein, carbs, fat, diet, count FROM shopping" +
                             "            JOIN food ON shopping.foodid = food.id" +
-                            "            WHERE shopping.userid = (select id from user where name = " + userName + ") AND count > 0";
-
-//            ResultSet rs = stmt.executeQuery(sql);
-//            rs.next();
-//            System.out.println(rs.getObject(8));
-
-//            AND count > 0
+                            "            WHERE shopping.userid = (select id from users where name = '" + userName + "') AND count > 0";
 
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
@@ -246,32 +237,29 @@ public class Queries {
         //TODO: overwrite the current shopping list in the database with the new list
 
 
-        Connection c = null;
-        Statement stmt = null;
-        try {
+        try (Connection c = DriverManager.getConnection(URL, USER, PWD)) {
             Class.forName("org.postgresql.Driver");
-            c = DriverManager
-                    .getConnection(URL, USER, PWD); //Please use your own postgreSQL password
             System.out.println("connected");
+            Statement stmt = c.createStatement();
 
+            String query = "SELECT id FROM users WHERE name = '" + userName + "'";
+            int userId = stmt.executeQuery(query).getInt(1);
 
-            Iterator<HashMap.Entry<Grocery, Integer>> iterator = newList.entrySet().iterator();
-            while(iterator.hasNext()){
-                stmt = c.createStatement();
-                Map.Entry<Grocery, Integer> entry = iterator.next();
+            //c.setAutoCommit(false);
+
+            for (Map.Entry<Grocery, Integer> entry : newList.entrySet()) {
                 Grocery grocery = entry.getKey();
                 int count = entry.getValue();
                 int foodId = grocery.getId();
 
-                String sql =
-                        "UPDATE shopping SET count = '"+count+"'" +
-                                "WHERE userid IN (SELECT id FROM user WHERE user.name = '" + userName + "') AND shopping.foodid = '" + foodId + "' ";
+                query = "UPDATE shopping SET count = '" + count + "'" +
+                            "WHERE userid IN " + userId + " AND shopping.foodid = '" + foodId + "' ";
 
-                stmt.executeUpdate(sql);
+                stmt.executeUpdate(query);
                 stmt.close();
             }
 
-            c.close();
+//            c.commit();
 
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());

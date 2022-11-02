@@ -1,14 +1,13 @@
-package furhatos.app.groceriesassistant.flow.main
+package furhatos.app.groceriesassistant.flow.main.user
 
 import furhatos.app.groceriesassistant.flow.Global
 import furhatos.app.groceriesassistant.events.control.*
 import furhatos.app.groceriesassistant.flow.UserInfo
+import furhatos.app.groceriesassistant.flow.main.Idle
+import furhatos.app.groceriesassistant.flow.main.user.OpenGui
 import furhatos.app.groceriesassistant.memory.Memory
-import furhatos.app.groceriesassistant.utils.sayAndAskMain
-import furhatos.flow.kotlin.furhat
-import furhatos.flow.kotlin.onNoResponse
-import furhatos.flow.kotlin.onResponse
-import furhatos.flow.kotlin.state
+import furhatos.app.groceriesassistant.flowUtils.sayAndAskMain
+import furhatos.flow.kotlin.*
 import furhatos.nlu.common.No
 import furhatos.nlu.common.Yes
 
@@ -22,6 +21,11 @@ fun NewUser(name: String) = state(Global) {
         furhat.say("Great!")
         goto(GatherInfo(name))
     }
+
+    onResponse(listOf("that is fine", "that is alright")) {
+        raise(Yes())
+    }
+
 
     onResponse<No> {
         val areYouSure = state(Global) {
@@ -74,6 +78,7 @@ fun GatherInfo(name: String) = state(Global) {
 
     onEvent<GotDiet> {
         furhat.say("perfect, i am ready to compose your first list!")
-        goto(SelectInteraction)
+        Memory.setNewUser()
+        goto(OpenGui)
     }
 }

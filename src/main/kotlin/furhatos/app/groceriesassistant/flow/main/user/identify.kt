@@ -1,9 +1,10 @@
-package furhatos.app.groceriesassistant.flow.main
+package furhatos.app.groceriesassistant.flow.main.user
 
 import furhatos.app.groceriesassistant.flow.Global
+import furhatos.app.groceriesassistant.flow.main.Idle
 import furhatos.app.groceriesassistant.memory.Memory
-import furhatos.app.groceriesassistant.utils.greeting
-import furhatos.app.groceriesassistant.utils.sayAndAskMain
+import furhatos.app.groceriesassistant.flowUtils.greeting
+import furhatos.app.groceriesassistant.flowUtils.sayAndAskMain
 import furhatos.flow.kotlin.*
 import furhatos.nlu.common.PersonName
 
@@ -21,7 +22,7 @@ val IdentifyUser = state(Global) {
         val isUser = Memory.setUser(name)
         if (isUser) {
             furhat.say("Good to see you again $name!")
-            goto(WithUserPrelude)
+            goto(OpenGui)
         }
         else goto(NewUser(name))
     }
