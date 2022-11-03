@@ -1,4 +1,5 @@
 import furhatos.app.groceriesassistant.memory.entity.*;
+
 import java.io.IOException;
 import java.sql.*;
 import java.util.*;
@@ -10,12 +11,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
-public class Queries {
+public class DatabaseConnection {
 
     private final Connection c;
     private final Statement stmt;
 
-    public Queries() throws SQLException, ClassNotFoundException {
+    public DatabaseConnection() throws SQLException, ClassNotFoundException {
         Class.forName("org.postgresql.Driver");
         c = DriverManager.getConnection(URL, USER, PWD);
         stmt = c.createStatement();
@@ -48,14 +49,33 @@ public class Queries {
         int weight = Integer.parseInt(rs.getString(4));
         int age = Integer.parseInt(rs.getString(5));
         Sex sex = Objects.equals(rs.getString(6), "MALE") ? Sex.MALE : Sex.FEMALE;
+        String dietName = rs.getString(11);
+        Diet diet;
+        if (dietName.equals("VEGAN")) {
+            diet = Diet.VEGAN;
+        } else if (dietName.equals("VEGETARIAN")) {
+            diet = Diet.VEGETARIAN;
+        } else if (dietName.equals("PESCATERIAN")) {
+            diet = Diet.PESCETARIAN;
+        } else {
+            diet = Diet.OMNIVORE;
+        }
 
-        Nutrition nutrition = new Nutrition(-1,-1,-1,-1, Diet.VEGAN);
+        Nutrition nutrition = new Nutrition(-1,-1,-1,-1, diet);
 
         User user = new User(username,height,weight,age,sex,nutrition);
 
         System.out.println(user);
 
         return user;
+    }
+
+    public List<String> getKinds() throws SQLException {
+        String query = "SELECT DISTINCT subgroup FROM food";
+        ResultSet rs = stmt.executeQuery(query);
+        List<String> kinds = new LinkedList<>();
+        while (rs.next()) kinds.add(rs.getString(1));
+        return kinds;
     }
 
     public void updateUser(User user) throws SQLException {
@@ -65,15 +85,20 @@ public class Queries {
         int age = user.getAge();
         int weight = user.getWeight();
         int height = user.getHeight();
-        String sex= user.getSex().toString();
+        Nutrition nutrition = user.nutrition;
+        int calories = nutrition.getCalories();
+        int protein = nutrition.getProtein();
+        int carbs = nutrition.getCarbs();
+        int fats = nutrition.getFats();
+        String sex = user.getSex().toString();
         Diet diet = user.getNutrition().getDiet();
 
-        String sql = "UPDATE users SET (age, weight, height, sex,diet) = " +
-                        "('" + age + "', '" + weight + "','" + height + "','" + sex + "','" + diet + "')" +
+        String sql = "UPDATE users SET (name, age, weight, height, sex, calories, protein, carbs, fats, diet) = " +
+                "('" + name + "','" + age + "','" + weight + "','" + height + "','" + sex + "','" +
+                        calories +"','" + protein + "','" + carbs + "','" + fats + "','" + diet + "')" +
                         "WHERE name = '" + name + "'";
 
         stmt.executeUpdate(sql);
-
     }
     public void addShoppingTable(String x) throws SQLException {
         String sql =
@@ -121,19 +146,19 @@ public class Queries {
             String subgrounp = rs.getString(3);
             String temp = rs.getObject(8).toString();
 
-            if (temp.equals("Vegan")) {
+            if (temp.equals("VEGAN")) {
                 Nutrition nutrition = new Nutrition(rs.getInt(4), rs.getInt(5), rs.getInt(6), rs.getInt(7), Diet.VEGAN);
                 Grocery grocery = new Grocery(id, name, subgrounp, nutrition);
                 list.put(grocery, rs.getInt(9));
-            } else if (temp.equals("Vegetarian")) {
+            } else if (temp.equals("VEGETARIAN")) {
                 Nutrition nutrition = new Nutrition(rs.getInt(4), rs.getInt(5), rs.getInt(6), rs.getInt(7), Diet.VEGETARIAN);
                 Grocery grocery = new Grocery(id, name, subgrounp, nutrition);
                 list.put(grocery, rs.getInt(9));
-            } else if (temp.equals("Pescaterian")) {
+            } else if (temp.equals("PESCATERIAN")) {
                 Nutrition nutrition = new Nutrition(rs.getInt(4), rs.getInt(5), rs.getInt(6), rs.getInt(7), Diet.PESCETARIAN);
                 Grocery grocery = new Grocery(id, name, subgrounp, nutrition);
                 list.put(grocery, rs.getInt(9));
-            } else if (temp.equals("Omnivore")) {
+            } else if (temp.equals("OMNIVORE")) {
                 Nutrition nutrition = new Nutrition(rs.getInt(4), rs.getInt(5), rs.getInt(6), rs.getInt(7), Diet.OMNIVORE);
                 Grocery grocery = new Grocery(id, name, subgrounp, nutrition);
                 list.put(grocery, rs.getInt(9));
@@ -146,7 +171,9 @@ public class Queries {
         //TODO: overwrite the current shopping list in the database with the new list
 
         String query = "SELECT id FROM users WHERE name = '" + userName + "'";
-        int userId = stmt.executeQuery(query).getInt(1);
+        ResultSet rs = stmt.executeQuery(query);
+        rs.next();
+        int userId = rs.getInt(1);
 
         //c.setAutoCommit(false);
 
@@ -169,9 +196,12 @@ public class Queries {
             //Display values
             Diet d = Diet.OMNIVORE;
             switch(rs.getString("Diet")){
-                case ("Vegan"): d = Diet.VEGAN;
-                case ("Vegetarian"): d = Diet.VEGETARIAN;
-                case ("Pescaterian"): d = Diet.PESCETARIAN;
+                case ("VEGAN"): d = Diet.VEGAN;
+                    break;
+                case ("VEGETARIAN"): d = Diet.VEGETARIAN;
+                    break;
+                case ("PESCATERIAN"): d = Diet.PESCETARIAN;
+                    break;
             }
 
             Grocery g = new Grocery(rs.getInt("id"), rs.getString("name"), rs.getString("subgroup"),
@@ -197,7 +227,7 @@ public class Queries {
     public ArrayList<String> getPreferenceVector(String userName) throws SQLException {
         //TODO: return this user's preference array,
         // with each index matching the primary key of the food
-        String query =  "SELECT foodid, pref FROM shopping8 " +
+        String query =  "SELECT foodid, pref FROM shopping " +
                 "WHERE userid = " + 0 +
                 " ORDER BY PREF" +
                 " LIMIT 10";
@@ -245,6 +275,36 @@ public class Queries {
                         "WHERE userid = (SELECT id FROM users WHERE name = '" + username +"') " +
                         "ORDER BY pref DESC " +
                         "LIMIT 10";
+        ResultSet rs = stmt.executeQuery(query);
+        return toGroceryList(rs);
+    }
+
+    private String acceptableDiets(User user) {
+        int max = user.nutrition.getDiet().getAsInt();
+        String res = "";
+        for (int n = 0; n < max; n++) {
+            res += "diet ILIKE '" + Diet.Companion.fromInt(n) + "' OR ";
+        }
+        return res + "diet ILIKE '" + Diet.Companion.fromInt(max) + "'";
+    }
+    public List<Grocery> recommendSimilar(
+        User user, Grocery item, int weight, int currentCalories, int maxCalories
+    ) throws SQLException {
+        Nutrition info = item.getInfo();
+        String username = user.getName();
+        String query = "SELECT * FROM food " +
+                            "JOIN shopping ON food.id = foodid " +
+                            "WHERE userid = (SELECT id FROM users WHERE name = '" + username + "') " +
+                            "AND (" + acceptableDiets(user) + ")" +
+                            " AND calories * " + (weight / 100) + " + " + currentCalories + "<" + maxCalories +
+                            " AND NOT maingroup = 'Alcoholic beverages'" +
+                            " ORDER BY " +
+                            "abs(calories - " + info.getCalories() + ") + " +
+                            "abs(protein - " + info.getProtein() + ") + " +
+                            "abs(carbs - " + info.getCarbs() + ") + " +
+                            "abs(fat - " + info.getFats() + ") ASC, pref DESC " +
+                            "LIMIT 10";
+        System.out.println(query);
         ResultSet rs = stmt.executeQuery(query);
         return toGroceryList(rs);
     }

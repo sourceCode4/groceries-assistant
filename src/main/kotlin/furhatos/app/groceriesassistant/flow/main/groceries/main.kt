@@ -8,8 +8,6 @@ import furhatos.app.groceriesassistant.flowUtils.alright
 import furhatos.app.groceriesassistant.memory.Memory
 import furhatos.app.groceriesassistant.memory.Memory.getGroceryItems
 import furhatos.app.groceriesassistant.nlu.*
-import furhatos.app.groceriesassistant.flowUtils.askMainQuestion
-import furhatos.app.groceriesassistant.flowUtils.howMany
 import furhatos.app.groceriesassistant.memory.entity.Compatibility
 import furhatos.app.groceriesassistant.memory.entity.Grocery
 import furhatos.flow.kotlin.*
@@ -36,6 +34,7 @@ val NewList = state(Groceries) {
                     else ""
                 }"
             }
+            goto(EditingList)
         }
     }
 }
@@ -43,7 +42,7 @@ val NewList = state(Groceries) {
 val EditingList: State = state(Groceries) {
     var addedFirst = false
     var justGotYes = false
-    var justSuggested = false
+//    var justSuggested = false
 
     onEntry { raise(AskMainQuestion) }
     onEvent<AskMainQuestion> {
@@ -53,16 +52,16 @@ val EditingList: State = state(Groceries) {
     onReentry {
         justGotYes = false
         if (addedFirst) {
-            if (!justSuggested && random(true, false)) {
-                justSuggested = true
-                call(Recommend)
-                reentry()
-            } else {
+//            if (!justSuggested && random(true, false)) {
+//                justSuggested = true
+//                call(Recommend())
+//                reentry()
+//            } else {
                 furhat.ask(random(
                     "Anything else?",
                     "Anything else you want to add?"))
-                justSuggested = false
-            }
+//                justSuggested = false
+//            }
         } else
             furhat.ask(random(
                 "Do you want to add anything?",
@@ -113,17 +112,16 @@ fun ChooseItem(
     options.forEach { option ->
         onResponse(option.name) {
             var grams = input.count?.value
-            if (grams == null || input.isUnspecifiedPlural) {
-                grams = call(HowMany(input.grocery.category?.text)) as Int? ?: 0
-            }
+            if (grams == null)
+                 grams = call(HowMany(input.grocery.text)) as Int? ?: 100
             when {
                 grams < 0 -> raise(DubiousResponse())
-                grams > 1 -> furhat.say("$grams ${input.grocery.text}")
+                grams > 1 -> furhat.say("$grams grams of ${input.grocery.value}")
                 else -> furhat.say(option.name)
             }
             val cmp = Memory.compatibility(option, grams)
             if (cmp != Compatibility.COMPATIBLE &&
-                call(AreYouSure(cmp)) as Boolean? == false
+                call(AreYouSure(cmp, option, grams)) as Boolean? == false
             ) terminate(false)
 
             Memory.addItem(option, grams)
@@ -144,33 +142,7 @@ fun ChooseItem(
     onExit { gui.clear() }
 }
 
-fun HowMany(category: String?) = state(Groceries) {
-    askMainQuestion(howMany())
-
-    onResponse<Number> {
-        val number = it.intent.value
-        when {
-            number == null -> propagate()
-            number < 1     -> raise(DubiousResponse())
-            else -> terminate(number)
-        }
-    }
-
-    onResponse<AddGroceries> {
-        val received = it.intent.groceries?.list
-        if (received == null) propagate()
-        else {
-            if (received.size == 1 &&
-                received.first().grocery?.category?.text == category &&
-                received.first().count != null)
-                raise(received.first().count!!)
-            else
-                propagate()
-        }
-    }
-}
-
-fun AreYouSure(cmp: Compatibility) = state(Groceries) {
+fun AreYouSure(cmp: Compatibility, item: Grocery, weight: Int) = state(Groceries) {
     onEntry {
         when (cmp) {
             Compatibility.INCOMPATIBLE -> furhat.say(
@@ -198,8 +170,11 @@ fun AreYouSure(cmp: Compatibility) = state(Groceries) {
     }
 
     onResponse<No> {
-        furhat.say(alright)
-        terminate(false)
+        furhat.say {
+            alright
+            +"here are some items with similar nutritional content"
+        }
+        terminate(call(Recommend(item, weight)))
     }
 }
 

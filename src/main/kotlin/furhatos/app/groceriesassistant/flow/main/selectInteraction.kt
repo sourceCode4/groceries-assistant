@@ -26,9 +26,8 @@ val SelectInteraction = state(WithUser) {
     onResponse<DoGroceries> {
         if (it.intent.buy != null)
             furhat.say("${it.intent.buy} some ${it.intent.groceries}, okay")
-        else {
-            furhat.say("${it.intent.groceries}, sure")
-        }
+        else
+            furhat.say("make a grocery list, sure")
         if (Memory.currentList().isNotEmpty())
             goto(NewOrExisting)
         else

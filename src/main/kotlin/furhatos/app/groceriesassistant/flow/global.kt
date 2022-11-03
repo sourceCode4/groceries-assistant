@@ -19,8 +19,10 @@ val Global = state {
         furhat.glance(it)
     }
 
-    onResponse<RequestRepeat> { raise(AskMainQuestion) }
     onReentry { raise(AskMainQuestion) }
+
+    onResponse<RequestRepeat> { raise(AskMainQuestion) }
+
 
     onResponse<Done> { raise(Exit()) }
 

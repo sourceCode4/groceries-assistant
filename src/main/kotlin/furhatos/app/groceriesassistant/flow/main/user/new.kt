@@ -4,7 +4,6 @@ import furhatos.app.groceriesassistant.flow.Global
 import furhatos.app.groceriesassistant.events.control.*
 import furhatos.app.groceriesassistant.flow.UserInfo
 import furhatos.app.groceriesassistant.flow.main.Idle
-import furhatos.app.groceriesassistant.flow.main.user.OpenGui
 import furhatos.app.groceriesassistant.memory.Memory
 import furhatos.app.groceriesassistant.flowUtils.sayAndAskMain
 import furhatos.flow.kotlin.*
@@ -22,7 +21,10 @@ fun NewUser(name: String) = state(Global) {
         goto(GatherInfo(name))
     }
 
-    onResponse(listOf("that is fine", "that is alright")) {
+    onResponse(listOf(
+            "that is fine",
+            "that is alright",
+            "it's all right")) {
         raise(Yes())
     }
 
@@ -32,8 +34,6 @@ fun NewUser(name: String) = state(Global) {
             var noResponse = 0
             onEntry { raise(AskMainQuestion) }
             onEvent<AskMainQuestion> { furhat.ask("Are you sure?") }
-
-            onReentry { furhat.listen() }
 
             onResponse<Yes> {
                 furhat.say("That's a shame!")
