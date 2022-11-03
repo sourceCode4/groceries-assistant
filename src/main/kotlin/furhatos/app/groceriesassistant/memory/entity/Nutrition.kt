@@ -15,6 +15,15 @@ enum class Diet : Comparable<Diet> {
         PESCETARIAN -> 2
         OMNIVORE -> 3
     }
+
+    companion object {
+        fun fromInt(n: Int): Diet = when {
+            n < 1 -> VEGAN
+            n == 1 -> VEGETARIAN
+            n == 2 -> PESCETARIAN
+            else   -> OMNIVORE
+        }
+    }
 }
 
 enum class Compatibility {

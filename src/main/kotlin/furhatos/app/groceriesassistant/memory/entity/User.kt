@@ -19,15 +19,18 @@ data class User(
     ) : this(name, height, weight, age) {
         this.sex = sex
         this.nutrition = nutrition
+        calculateNutrition()
     }
 
-    private fun getDailyCalories(): Double = when (sex) {
+    private fun getDailyCalories(): Int = when (sex) {
         Sex.FEMALE -> 655 + 9.6 * weight + 1.8 * height - 4.7 * age
         Sex.MALE   -> 66 + 13.7 * weight + 5 * height - 6.8 * age
-    }
+    }.toInt()
+
+    fun maxCalories(days: Int): Int = getDailyCalories() * days
 
     fun calculateNutrition() {
-        val cals = getDailyCalories().toInt()
+        val cals = getDailyCalories()
         this.nutrition = Nutrition(
             cals,
             (weight * 0.8).toInt(),

@@ -7,6 +7,7 @@ import furhatos.app.groceriesassistant.flow.gui
 import furhatos.app.groceriesassistant.flowUtils.alright
 import furhatos.app.groceriesassistant.flowUtils.recommend
 import furhatos.app.groceriesassistant.memory.Memory
+import furhatos.app.groceriesassistant.memory.entity.Grocery
 import furhatos.flow.kotlin.*
 import furhatos.nlu.DynamicIntent
 import furhatos.nlu.common.No
@@ -16,18 +17,22 @@ import furhatos.util.Language
 
 private var currentQuestion = recommend
 
-val Recommend = state(Groceries) {
-    val suggested = Memory.recommend()
+fun Recommend(
+    item: Grocery? = null,
+    weight: Int = 100
+) = state(Groceries) {
+    val suggested = Memory.recommend(item, weight)
 
     onEntry {
         gui.clear()
         suggested.forEach {
             gui.append(it.name)
         }
+        if (suggested.isEmpty()) terminate(false)
         raise(AskMainQuestion)
     }
 
-    onEvent<AskMainQuestion> { furhat.ask(currentQuestion) }
+    onEvent<AskMainQuestion> { furhat.ask(currentQuestion, timeout = 8000) }
 
     onPartialResponse<Yes> {
         val secondary = it.secondaryIntent
@@ -41,13 +46,13 @@ val Recommend = state(Groceries) {
 
     onResponse<No> {
         furhat.say(alright)
-        terminate()
+        terminate(false)
     }
 
     var count: Int?
-    for (item in suggested) {
+    for (option in suggested) {
         onResponse(DynamicIntent(
-            listOf("@count ${item.name}"),
+            listOf("@count ${option.name}"),
             mapOf("count" to Number::class.java),
             Language.ENGLISH_US)
         ) {
@@ -56,14 +61,14 @@ val Recommend = state(Groceries) {
                 raise(DubiousResponse())
             else {
                 count = count ?: 1
-                raise(item.name)
+                raise(option.name)
             }
         }
-        onResponse(item.name) {
-            count = call(HowMany(item.subgroup)) as Int?
-            Memory.addItem(item, count ?: 1)
-            furhat.say("$count ${item.name}")
-            terminate()
+        onResponse(option.name) {
+            count = call(HowMany(option.subgroup)) as Int?
+            Memory.addItem(option, count ?: 1)
+            furhat.say("$count ${option.name}")
+            terminate(true)
         }
     }
 

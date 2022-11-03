@@ -1,6 +1,6 @@
 package furhatos.app.groceriesassistant.memory
 
-import Queries
+import DatabaseConnection
 import furhatos.app.groceriesassistant.memory.entity.*
 import furhatos.app.groceriesassistant.nlu.FieldEnum
 import furhatos.app.groceriesassistant.nlu.GroceryKind
@@ -9,7 +9,7 @@ import furhatos.app.groceriesassistant.nlu.UserFieldValue
 object Memory {
 
     private lateinit var user: User
-    private val database = Queries()
+    private val database = DatabaseConnection()
     private val shoppingList: HashMap<Grocery, Int> = HashMap()
     private var totalCalories = 0
     private var days = 1
@@ -77,9 +77,10 @@ object Memory {
 
     fun getKinds(): List<String> {
         //TODO: temp for testing, call the database
-        return listOf("banana", "apple", "tomato", "chocolate", "ice cream", "fish",
-            "salmon", "tuna", "steak", "burger", "veggie_burger:veggie burger, vegetarian burger",
-            "mayonnaise:mayonnaise,mayo")
+        return database.kinds
+//        listOf("banana", "apple", "tomato", "chocolate", "ice cream", "fish",
+//            "salmon", "tuna", "steak", "burger", "veggie_burger:veggie burger, vegetarian burger",
+//            "mayonnaise:mayonnaise,mayo")
     }
 
     /**
@@ -105,8 +106,11 @@ object Memory {
         shoppingList.clear()
     }
 
-    fun recommend(): List<Grocery> {
-        return database.recommendItems(userName)
+    fun recommend(item: Grocery? = null, weight: Int = 100): List<Grocery> {
+        return if (item == null)
+            database.recommendItems(userName)
+        else
+            database.recommendSimilar(user, item, weight, totalCalories, user.maxCalories(days))
 //        listOf("snickers", "twix", "bueno").map {
 //            Grocery(1, it, "chocolate", EmptyNutrition)
     }

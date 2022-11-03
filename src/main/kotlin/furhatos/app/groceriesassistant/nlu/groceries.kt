@@ -26,12 +26,13 @@ class GroceryCategory : EnumEntity(stemming = true) {
  *  Kind of the item from a category: e.g. cod fish, full fat milk, rye bread, beef steak
  */
 class GroceryKind(
-    val category: GroceryCategory? = null
-) : ComplexEnumEntity() {
+//    val category: GroceryCategory? = null
+) : EnumEntity(stemming = true) {
     override fun getEnum(lang: Language): List<String> {
-        return mutableListOf("banana", "apple", "tomato", "milk chocolate", "dark chocolate",
-            "white chocolate", "vanilla ice cream", "chocolate ice cream", "cod fish", "salmon", "wild salmon",
-            "tuna", "steak", "beef burger", "veggie burger", "mayonnaise", "@category")
+        return Memory.getKinds()
+//        mutableListOf("banana", "apple", "tomato", "milk chocolate", "dark chocolate",
+//            "white chocolate", "vanilla ice cream", "chocolate ice cream", "cod fish", "salmon", "wild salmon",
+//            "tuna", "steak", "beef burger", "veggie burger", "mayonnaise", "@category")
     }
 }
 
@@ -44,9 +45,9 @@ class QuantifiedGrocery(
             "@grocery",
             "some @grocery",
             "some more @grocery",
-            "@count @grocery",
-            "@count more @grocery",
-            "@count packs of @grocery",
+            "@count of @grocery",
+            "@count more grams of @grocery",
+            "@count grams of @grocery",
             "@grocery", "a @grocery", "an @grocery"
         )
     }

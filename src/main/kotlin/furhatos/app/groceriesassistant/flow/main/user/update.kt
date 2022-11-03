@@ -7,9 +7,13 @@ import furhatos.app.groceriesassistant.memory.Memory
 import furhatos.app.groceriesassistant.nlu.EditUser
 import furhatos.app.groceriesassistant.flowUtils.askMainQuestion
 import furhatos.app.groceriesassistant.flowUtils.done
+import furhatos.app.groceriesassistant.nlu.Done
 import furhatos.flow.kotlin.furhat
 import furhatos.flow.kotlin.onResponse
+import furhatos.flow.kotlin.raise
 import furhatos.flow.kotlin.state
+import furhatos.nlu.common.No
+import furhatos.nlu.common.Yes
 
 val UpdateUser = state(WithUser) {
 
@@ -46,4 +50,8 @@ val UpdateUser = state(WithUser) {
     onEvent<GotInfo> { reentry() }
 
     onExit { Memory.commitUser() }
+
+    onResponse<Yes> { raise(Done()) }
+
+    onResponse<No> { reentry() }
 }

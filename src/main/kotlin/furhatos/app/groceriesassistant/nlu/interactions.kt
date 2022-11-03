@@ -62,11 +62,11 @@ class UpdateUserInfo(
 ) : Intent() {
     override fun getExamples(lang: Language): List<String> {
         return listOf(
-            "i want to @edit my @info",
+            "i want to @edit info",
             "i want to @edit my user @info",
             "i would like to @edit my user @info",
-            "@edit my user @info",
-            "let me @edit my user @info"
+            "@edit user @info",
+            "@edit @info"
         )
     }
 }
@@ -80,7 +80,7 @@ class Exit(val exit: ExitSynonym? = null) : Intent() {
 
 class Done : Intent() {
     override fun getExamples(lang: Language): List<String> {
-        return listOf("I'm done", "that's it", "that would be it",
+        return listOf("I'm done", "that's it", "that would be all",
                       "that is all", "nothing else")
     }
 }
