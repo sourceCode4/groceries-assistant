@@ -54,7 +54,7 @@ public class DatabaseBuilder {
 
             Connection init = DriverManager.getConnection("jdbc:postgresql://localhost:5432/", USER, PASS);
             Statement initStmt = init.createStatement();
-            String query = "CREATE DATABASE TEST6";
+            String query = "CREATE DATABASE groceriesassistant";
             initStmt.execute(query);
             initStmt.close();
             init.close();
