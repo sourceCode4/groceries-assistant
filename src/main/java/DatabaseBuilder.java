@@ -4,49 +4,10 @@ import java.sql.*;
 
 public class DatabaseBuilder {
 
-    static String csvFilePath = "newdata.csv"; //TODO: fill your absolute path to newdata.csv
+    static String csvFilePath = "newdata.csv";
     static String DB_URL = "jdbc:postgresql:groceriesassistant";
-    static String USER = "postgres";
-    static String PASS = "ana"; //TODO: fill in your password here
-
-    public static void ana(){
-        try {
-            Class.forName("org.postgresql.Driver");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        try {
-            Connection init = DriverManager.getConnection("jdbc:postgresql://localhost:5432/", USER, PASS);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        Connection connection = null;
-        try {
-            connection = DriverManager.getConnection(DB_URL, USER, PASS);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        Statement stmt = null;
-        try {
-            stmt = connection.createStatement();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        String query = "";
-        query = "CREATE TABLE shopping " +
-                "(userid     INT NOT NULL," +
-                "foodid      INT NOT NULL," +
-                " COUNT            INT, " +
-                " PREF             FLOAT," +
-                " AMOUNT              INT," +
-                "PRIMARY KEY(userid, foodid))";
-        try {
-            stmt.execute(query);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        System.out.println("created shopping table");
-    }
+    static String USER = "postgres"; //username is postgres by default, if you changed it then replace it here
+    static String PASS = ""; //fill in your db password here
 
     public static void build(){
         try {
