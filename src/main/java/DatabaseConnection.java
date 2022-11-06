@@ -206,12 +206,12 @@ public class DatabaseConnection {
         while(rs.next()){
             //Display values
             Diet d = Diet.OMNIVORE;
-            switch(rs.getString("Diet")){
-                case ("VEGAN"): d = Diet.VEGAN;
+            switch(rs.getString("Diet").toLowerCase()){
+                case ("vegan"): d = Diet.VEGAN;
                     break;
-                case ("VEGETARIAN"): d = Diet.VEGETARIAN;
+                case ("vegetarian"): d = Diet.VEGETARIAN;
                     break;
-                case ("PESCATERIAN"): d = Diet.PESCETARIAN;
+                case ("pescaterian"): d = Diet.PESCETARIAN;
                     break;
             }
 
