@@ -34,7 +34,6 @@ public class DatabaseConnection {
         //TODO: if the user with this name exists, return that,
         //  otherwise return null
 
-
         String sql = "SELECT *  FROM users WHERE users.name = '" + name +"'";
 
         ResultSet rs = stmt.executeQuery(sql);
@@ -167,6 +166,14 @@ public class DatabaseConnection {
         }
     }
 
+    private void setPreferenceVector() {
+        try {
+            Process p = Runtime.getRuntime().exec("recommendations.py");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void overwriteList(String userName, HashMap<Grocery, Integer> newList) throws SQLException {
         //TODO: overwrite the current shopping list in the database with the new list
 
@@ -175,19 +182,23 @@ public class DatabaseConnection {
         rs.next();
         int userId = rs.getInt(1);
 
-        //c.setAutoCommit(false);
+        query = "UPDATE shopping SET count = 0 WHERE userid = " + userId;
+        stmt.executeUpdate(query);
 
+        c.setAutoCommit(false);
         for (Map.Entry<Grocery, Integer> entry : newList.entrySet()) {
             Grocery grocery = entry.getKey();
             int count = entry.getValue();
             int foodId = grocery.getId();
 
             query = "UPDATE shopping SET count = '" + count + "'" +
-                        "WHERE userid IN " + userId + " AND shopping.foodid = '" + foodId + "' ";
+                        "WHERE userid = " + userId + " AND shopping.foodid = '" + foodId + "' ";
 
             stmt.executeUpdate(query);
+            setPreferenceVector();
         }
-//            c.commit();
+        c.commit();
+        c.setAutoCommit(true);
     }
 
     private List<Grocery> toGroceryList(ResultSet rs) throws SQLException {
@@ -217,56 +228,11 @@ public class DatabaseConnection {
         String query =  "SELECT * FROM food " +
                 "JOIN shopping ON food.id = foodid " +
                 "WHERE userid = (SELECT id FROM users WHERE name = '" + username +"') " +
-                "AND Subgroup ILIKE '" + item + "' "+
+                "AND '" + item + "' ILIKE '%' || subgroup || '%' "+
                 "ORDER BY pref DESC " +
                 "LIMIT 10";
         ResultSet rs = stmt.executeQuery(query);
         return toGroceryList(rs);
-    }
-
-    public ArrayList<String> getPreferenceVector(String userName) throws SQLException {
-        //TODO: return this user's preference array,
-        // with each index matching the primary key of the food
-        String query =  "SELECT foodid, pref FROM shopping " +
-                "WHERE userid = " + 0 +
-                " ORDER BY PREF" +
-                " LIMIT 10";
-        ArrayList<String> list = new ArrayList<>();
-        ResultSet rs = stmt.executeQuery(query);
-        while(rs.next()){
-            //Display values
-            System.out.print("Preference: " + rs.getString("PREF"));
-            System.out.print("foodid: " + rs.getString("PREF"));
-            list.add((rs.getString("foodid")) + ", "+rs.getString("PREF"));
-        }
-
-        return list;
-    }
-
-    public void setPreferenceVector() {
-        try {
-            Process p = Runtime.getRuntime().exec("recommendations.py");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-//        try {
-//            Connection connection = DriverManager.getConnection(URL, USER, PWD);
-//            Statement stmt = connection.createStatement();
-//
-//            for(int i=0; i<prefs.length; i++) {
-//
-//                String sql =
-//                        "UPDATE shopping" +
-//                        "SET pref = '" + prefs[i] + "' " +
-//                        "WHERE userid = (SELECT id FROM users WHERE name = '" + userName + "') " +
-//                            "AND FoodID = " + i;
-//
-//                stmt.executeUpdate(sql);
-//            }
-//
-//        } catch (SQLException ex) {
-//            ex.printStackTrace();
-//        }
     }
 
     public List<Grocery> recommendItems(String username) throws SQLException {
@@ -307,23 +273,5 @@ public class DatabaseConnection {
         System.out.println(query);
         ResultSet rs = stmt.executeQuery(query);
         return toGroceryList(rs);
-    }
-
-    public int[][] getItemsForRecommendation() throws SQLException {
-        String query = "SELECT shopping userid, foodid, amount FROM shopping";
-        String query2 = "SELECT COUNT(*) FROM shopping";
-        ResultSet count = stmt.executeQuery(query2);
-        ResultSet rs = stmt.executeQuery(query);
-
-        count.next();
-        int num = count.getInt(1);
-        int[][] result = new int[num][3];
-        for(int i = 0; i<num; i++){
-            rs.next();
-            result[i][0] = rs.getInt(1);
-            result[i][1] = rs.getInt(2);
-            result[i][2] = rs.getInt(3);
-        }
-        return result;
     }
 }
