@@ -265,10 +265,10 @@ public class DatabaseConnection {
                             " AND calories * " + (weight / 100) + " + " + currentCalories + "<" + maxCalories +
                             " AND NOT maingroup = 'Alcoholic beverages'" +
                             " ORDER BY " +
-                            "abs(calories - " + info.getCalories() + ") + " +
-                            "abs(protein - " + info.getProtein() + ") + " +
-                            "abs(carbs - " + info.getCarbs() + ") + " +
-                            "abs(fat - " + info.getFats() + ") ASC, pref DESC " +
+                            "((calories - " + info.getCalories() + ") ^ 2 + " +
+                            "(protein - " + info.getProtein() + ") ^ 2 + " +
+                            "(carbs - " + info.getCarbs() + ") ^ 2 + " +
+                            "(fat - " + info.getFats() + ") ^ 2) ASC, pref DESC " +
                             "LIMIT 10";
         System.out.println(query);
         ResultSet rs = stmt.executeQuery(query);
