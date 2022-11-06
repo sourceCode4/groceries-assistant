@@ -31,8 +31,7 @@ public class DatabaseConnection {
     final String USER = "postgres";
     final String PWD  = "admin";
     public User getUser(String name) throws SQLException {
-        //TODO: if the user with this name exists, return that,
-        //  otherwise return null
+        //if the user with this name exists, return that, otherwise return null
 
         String sql = "SELECT *  FROM users WHERE users.name = '" + name +"'";
 
@@ -78,8 +77,6 @@ public class DatabaseConnection {
     }
 
     public void updateUser(User user) throws SQLException {
-        //TODO:update the age, weight, height, sex and diet
-        //assume it is an existing user
         String name = user.getName();
         int age = user.getAge();
         int weight = user.getWeight();
@@ -109,7 +106,6 @@ public class DatabaseConnection {
     }
 
     public void addNewUser(User user) throws SQLException {
-        //TODO:add this new user to the database
         String name = user.getName();
         int age = user.getAge();
         int weight = user.getWeight();
@@ -174,9 +170,8 @@ public class DatabaseConnection {
         }
     }
 
+    /** overwrite the current shopping list in the database with the new list */
     public void overwriteList(String userName, HashMap<Grocery, Integer> newList) throws SQLException {
-        //TODO: overwrite the current shopping list in the database with the new list
-
         String query = "SELECT id FROM users WHERE name = '" + userName + "'";
         ResultSet rs = stmt.executeQuery(query);
         rs.next();
